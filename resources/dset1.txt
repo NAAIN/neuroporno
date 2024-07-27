@@ -1,0 +1,90 @@
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+PROZчИТАЛСЯ НО ГДЭ
+
+#Управляющие символы (0x00…0x1F) — предназначены для управления передачей и выводом текста на терминал[15]. Группа начинается символом NUL (0x00), означающим незаписанный участок, например перфоленты, и этот символ должен игнорироваться при выводе на экран или на печать[16]. За пределами группы, в конце таблицы также располагается символ DEL 0x7F — участок перфоленты, пробитый целиком, означающий, что символ, который здесь располагался был удалён, а значит его также следует пропустить[16][17];
+Сами управляющие символы основной группы изначально были разделены на 4 подгруппы: управление передачей (0x01..0x07), форматирование (0x08..0x0F), управление устройством (0x10..0x17) и разделители потоков данных (0x18..0x1F)[18]. В версии 67 года этот порядок был отчасти нарушен из-за переноса дополнительных управляющих символов
+Группа цифр и основных знаков препинания — делится на две подгруппы, соответствующие верхнему и нижнему регистру.
+Группа начинается с пробела 0x20 — было принято решение, что пробел должен считаться печатным, а не управляющим символом, но при этом располагаться в самом начале — для корректной работы алгоритмов сортировки[19];
+Цифры идут во второй подгруппе — такое решение было принято для того, чтобы их легко было преобразовать в Двоично-десятичный код, убрав старшие 4 бита — и обратно, прибавив префикс 00112: например цифра 5 имеет код 0011 01012. По этой причине цифры невозможно было разместить в первой подгруппе, так как в ней первым идёт пробел[20]. Другая причина расположения цифр в этой группе — было необходимо, чтобы при сортировке большинство знаков препинания располагались раньше цифр и букв[21];
+9 символов после пробела — знаки препинания (!"#$%&'()), идущие в том порядке, в котором их располагали на пишущих машинках тех лет[11], за исключением скобок, которые располагались на позициях 0x28 и 0x29, так как над цифра «0» оказалась под кодовой позицией пробела[22]. Однако на электромеханических пишущих машинах, в частности IBM Selectric расположение этих знаков было иным, что связано с наличием у некоторых из них механизма дозирования силы удара, который требовал расположения на одной клавише знаков, близких по оптической плотности. Окончательно отличное от таблицы ASCII положение этих знаков было закреплено в IBM PC.
+Символы точки и запятой в пишущих машинках тех лет дублировались в обоих регистрах. В ASCII было решено не дублировать знаки, а заполнить освободившееся место символами < и >[23]. Знак вопроса также спарен со знаком косой черты как на пишущих машинках[11].
+Группа заглавных букв начинается с символа «@» (0x40) — предполагалось, что для машин, поставляемых во Францию и Италию этот символ будет заменяться на «À». Также, положение заглавных латинских букв и цифр было выбрано из соображений совместимости с шестибитной кодировкой DEC SIXBIT. Три позиции после заглавных букв (0x5B, 0x5C и 0x5D) также предполагалось заменять при необходимости на местные символы.
+Группа строчных букв появилась в ASCII-1965, но была пересмотрена в ASCII-1967. Все строчные буквы расположены так же, как в соответствующие заглавные, что позволяет переключать регистр, изменяя лишь старший бит. Позиции 0x60, 0x7B, 0x7C и 0x7D также предполагалось менять на местные при необходимости. В редакции 65-го года был добавлен символ логического отрицания (¬,0x7C), который в версии 67-го года был убран.
+Важная особенность — ASCII, в отличие, к примеру, от ITA2, не использует переключения регистров[21]. Хотя переключение регистров для заглавных букв могло бы уменьшить требуемое количество бит, и соответственно увеличить скорости передачи и уменьшить требуемое место на носителях, однако повышает риск не прочесть сообщение при повреждении[24]. Было решено отказаться от использования регистров и уместить все символы в 7 бит[21]. Тем не менее, в набор включены символы переключения регистра (ESC, SI и SO) для целей дальнейшего расширения[24].
+
+27112113114115116117118119120121122123441451919249505152535455565748189187845363314411110610998187698284898573798021922113463534103104105107206583687071727475761862222201001011021622690886786667877188190191163897989913179118321892931737403996110
+
+	
+This article needs to be updated. Please help update this article to reflect recent events or newly available information. (February 2022)
+
+A large group of fursuit owners at a furry convention
+The furry fandom is a subculture interested in anthropomorphic animal characters.[1][2][3] Some examples of anthropomorphic attributes include exhibiting human intelligence and facial expressions, speaking, walking on two legs, and wearing clothes. The term "furry fandom" is also used to refer to the community of people who gather on the Internet and at furry conventions.[4]
+
+History
+The furry fandom has its roots in the underground comix movement of the 1970s, a genre of comic books that depict explicit content.[citation needed] In 1976, a pair of cartoonists created the amateur press association Vootie, which was dedicated to animal-focused art. Many of its featured works contained adult themes, such as "Omaha" the Cat Dancer, which contained explicit sex.[5][6] Vootie grew a small following over the next several years, and its contributors began meeting at science fiction and comics conventions.
+
+According to fandom historian Fred Patten, the concept of furry originated at a science fiction convention in 1980,[7] when a character drawing from Steve Gallacci's Albedo Anthropomorphics started a discussion of anthropomorphic characters in science fiction novels. This led to the formation of a discussion group that met at science fiction conventions and comics conventions.
+
+The specific term furry fandom was being used in fanzines as early as 1983, and had become the standard name for the genre by the mid-1990s, when it was defined as "the organized appreciation and dissemination of art and prose regarding 'Furries', or fictional mammalian anthropomorphic characters".[8] However, fans consider the origins of furry fandom to be much earlier, with fictional works such as Kimba, the White Lion, released in 1965, Richard Adams' novel Watership Down, published in 1972 (and its 1978 film adaptation), as well as Disney's Robin Hood as oft-cited examples.[7] Internet newsgroup discussion in the 1990s created some separation between fans of "funny animal" characters and furry characters, meant to avoid the baggage that was associated with the term "furry".[9]
+
+During the 1980s, furry fans began to publish fanzines, developing a diverse social group that eventually began to schedule social gatherings. By 1989, there was sufficient interest to stage the first furry convention.[10] The convention was called Confurence 0, and it was held at the Holiday Inn Bristol Plaza in Costa Mesa, California.[11] Once the Internet became accessible to the general population in the 1990s, it became the most popular means for furry fans to socialize.[12] The newsgroup alt.fan.furry was created in November 1990, and virtual environments such as MUCKs also became popular places on the internet for fans to meet and communicate.[13]
+
+Inspiration
+Allegorical novels, including works of both science fiction and fantasy, and cartoons featuring anthropomorphic animals are often cited as the earliest inspiration for the fandom.[7] A survey conducted in 2007 suggested that, when compared with a non-furry control group, a higher proportion of those self-identifying as furries liked cartoons "a great deal" as children and recalled watching them significantly more often, as well as being more likely to enjoy works of science fiction than those outside of the community.[14]
+
+Activities
+According to a survey from 2008, most furries believe that visual art, conventions, literature, and online communities are strongly important to the fandom.[15] The furry fandom is male-dominated, with surveys reporting around 80% male respondents.[16][15][17]
+
+Crafts
+
+Sculpture at Further Confusion
+Fans with craft skills create their own plush toys, sometimes referred to as plushies, and also build elaborate costumes called fursuits,[18] which are worn for fun or to participate in parades, convention masquerades, dances, or fund-raising charity events (as entertainers).[19] Fursuits range from designs featuring simple construction resembling some entertainment and sports mascots[14] to those with more sophisticated features such as moving jaw mechanisms, animatronic parts, prosthetic makeup, and other features. Fursuits range in price from $500, for mascot-like designs, to an upwards of $10,000 for models incorporating animatronics.[20] While about 80% of furries do not own a full fursuit,[16][15][14] often citing their expensive cost as the decisive factor,[14] a majority of them hold positive feelings towards fursuiters and the conventions in which they participate.[16][15] Some fans may also wear "partial" suits consisting simply of ears and a tail, or a head, paws, and a tail.[14] A much larger proportion of individuals who attend conventions own a full or partial fursuit—45%, according to a survey done at Anthrocon 2018—which has been attributed to convention attendees' generally higher likelihood to be able to afford to buy a fursuit if they can afford convention travel expenses.[21]
+
+Furry fans also pursue puppetry, recording videos and performing live shows such as Rapid T. Rabbit and Friends and the Funday PawPet Show, and create furry accessories, such as ears or tails.[22]
+
+Role-playing
+
+Main article: Fursona
+
+Cartoon anthropomorphic vixen, an example of a furry character
+Anthropomorphic animal characters created by furry fans, known as fursonas,[23] are used for role-playing in MUDs,[24] on internet forums, or on electronic mailing lists.[25] A variety of species are employed as the basis of these personas, although many furry fans (for example over 60% of those surveyed in 2007) choose to identify themselves with carnivorans.[26][27] The longest-running online furry role-playing environment is FurryMUCK, which was established in 1990.[28] Many furry fans had their first exposure to the fandom come from multiplayer online role-playing games.[29][unreliable source?] Another popular online furry social game is called Furcadia, created by Dragon's Eye Productions. There are also several furry-themed areas and communities in the virtual world Second Life.[30]
+
+Conventions
