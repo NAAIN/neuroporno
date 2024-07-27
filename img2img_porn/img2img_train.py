@@ -6,8 +6,8 @@ from torchvision import transforms
 from PIL import Image
 import os
 # КРУТИЛАЧКИИИ
-batch_size = 1000
-learn_rate = 0.0001
+batch_size = 1 #лучше по одной, хоть модель поумнее будет (наверн)
+learn_rate = 0.001
 num_epochs = 1200
 datasetDir = "resources/img2img_dataset/"
 ExistsModelPthName = ""
@@ -34,8 +34,8 @@ class CustomDataset(Dataset):
         return image
     
 transform = transforms.Compose([
-    #transforms.Resize((1024, 1024)),
-    transforms.Resize((512, 512)),
+    transforms.Resize((1024, 1024)),
+    #transforms.Resize((512, 512)),
     transforms.ToTensor(),
 ])
 dataset = CustomDataset(datasetDir,transform)
@@ -45,17 +45,14 @@ class Autoencoder(nn.Module):
         super(Autoencoder, self).__init__()
         self.encoder = nn.Sequential(
             nn.Conv2d(3, 64, kernel_size=4, stride=2, padding=1),
-            nn.ReLU(),
             nn.Conv2d(64, 128, kernel_size=4, stride=2, padding=1),
             nn.ReLU(),
         )
         self.decoder = nn.Sequential(
             nn.ConvTranspose2d(128, 64, kernel_size=4, stride=2, padding=1),
-            nn.ReLU(),
             nn.ConvTranspose2d(64, 3, kernel_size=4, stride=2, padding=1),
             nn.Sigmoid(),
         )
-
     def forward(self, x):
         x = self.encoder(x)
         x = self.decoder(x)
