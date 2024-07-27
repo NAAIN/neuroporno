@@ -1,7 +1,26 @@
 import torch
 from torch.utils.data import Dataset, DataLoader
 import os.path
-
+# КРУТИЛАЧКИИИ
+embed_size = 128
+hidden_size = 128
+num_layers = 12
+#^^^^^^^^^^^^^^^^настройки НОВОЙ обучаемой модели(если доучивать то эти крутилки не учитываются)
+batch_size = 1000
+learn_rate = 0.00001
+num_epochs = 12000
+datasetFile = "resources/dset.txt"
+ExistsModelPthName = ""
+#ExistsModelPthName = "models/GRU_degenerat_начал_чота_понимать.pth" #закомментируй чтобы создать новую модель
+LearnedPthName = "models/RNN_degenerat.pth"
+start_str = "жопа"
+debug_in_name = True #Добавляет колво эпох, learn rate и параметры слоёв в название файла
+early_stop = False
+early_stopping_patience = 10
+early_stopping_counter = 0
+early_stopping_factor = 0.1
+#============================
+#Код ниже лучше не трогать (говнокод warning)
 class TextDataset(Dataset):
     def __init__(self, file_path):
         with open(file_path, 'r') as f:
@@ -17,7 +36,7 @@ class TextDataset(Dataset):
     def __getitem__(self, idx):
         return torch.tensor(self.data[idx], dtype=torch.long), torch.tensor(self.data[idx + 1], dtype=torch.long)
 
-dataset = TextDataset('dset.txt')
+dataset = TextDataset(datasetFile)
 dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
 
 import torch.nn as nn
@@ -35,15 +54,8 @@ class CharRNN(nn.Module):
         out = self.fc(out[:, -1, :])  # Используем последний временной шаг
         return out
 
-embed_size = 32
-hidden_size = 32
-num_layers = 10
-batch_size = 420
-learn_rate = 0.1
-num_epochs = 10000
-
-if os.path.isfile("RNN_degenerat.pth"):
-    checkpoint = torch.load("RNN_degenerat.pth")
+if os.path.isfile(ExistsModelPthName):
+    checkpoint = torch.load(ExistsModelPthName)
     saved_vocab_size = checkpoint['vocab_size']
     current_vocab_size = len(dataset.chars)
     if current_vocab_size != saved_vocab_size:
@@ -84,22 +96,15 @@ try:
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
-            print(f'Epoch {epoch+1}/{num_epochs}, Loss: {loss.item()}', end='\r')
-        print(f'Epoch {epoch+1}/{num_epochs}, Loss: {loss.item()}')
+            print(f'Epoch {epoch}/{num_epochs}, Loss: {loss.item()}', end='\r')
+        print(f'Epoch {epoch}/{num_epochs}, Loss: {loss.item()}')
 except KeyboardInterrupt:
     print("не трогайте сука9(9((")
-    # torch.save({
-    #     'model_state_dict': model.state_dict(),
-    #     'char_to_idx': dataset.char_to_idx,
-    #     'idx_to_char': dataset.idx_to_char,
-    #     'vocab_size': len(dataset.chars)
-    # }, "RNN_degenerat.pth")
     
 def generate_text(model, start_str, length=100):
     model.eval()
     chars = list(start_str)
     input_seq = torch.tensor([dataset.char_to_idx[c] for c in start_str], dtype=torch.long).unsqueeze(0)
-    
     with torch.no_grad():
         for _ in range(length):
             output = model(input_seq)
@@ -110,10 +115,16 @@ def generate_text(model, start_str, length=100):
     
     return ''.join(chars)
 
+if debug_in_name: LearnedPthName += f"{epoch}_{learn_rate}_{embed_size}_{hidden_size}_{num_layers}"
+
 torch.save({
     'model_state_dict': model.state_dict(),
     'char_to_idx': dataset.char_to_idx,
     'idx_to_char': dataset.idx_to_char,
-    'vocab_size': len(dataset.chars)
-}, "RNN_degenerat.pth")
+    'vocab_size': len(dataset.chars),
+    "embed_size": embed_size,
+    "hidden_size": hidden_size,
+    "num_layers": num_layers,
+}, LearnedPthName)
+
 print(generate_text(model, 'Привет, ЛУКОЙЛ??', 100))

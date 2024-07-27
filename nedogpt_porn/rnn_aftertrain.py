@@ -1,7 +1,8 @@
 import torch
-from torch.utils.data import Dataset, DataLoader
-import numpy as np
 import torch.nn as nn
+
+model_file = "models/RNN_degenerat.pth0_1e-05_128_128_12"
+length=100
 
 class CharRNN(nn.Module):
     def __init__(self, vocab_size, embed_size, hidden_size, num_layers):
@@ -19,16 +20,11 @@ class CharRNN(nn.Module):
         return out
 
 vocab_size = 1
-asel = torch.load("RNN_degenerat.pth")
-model = CharRNN(vocab_size=asel["vocab_size"], embed_size=64, hidden_size=128, num_layers=2)
+asel = torch.load(model_file)
+model = CharRNN(vocab_size=asel["vocab_size"], embed_size=asel["embed_size"], hidden_size=asel["hidden_size"], num_layers=asel["num_layers"])
 model.eval()
-#model = CharRNN(vocab_size, embed_size=64, hidden_size=128, num_layers=2)
-import torch.optim as optim
 
-criterion = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=0.0001)
-
-def generate_text(model, start_str, length=100):
+def generate_text(model, start_str, length):
     model.eval()
     chars = list(start_str)
     input_seq = torch.tensor([asel['char_to_idx'][c] for c in start_str], dtype=torch.long).unsqueeze(0)
@@ -43,11 +39,16 @@ def generate_text(model, start_str, length=100):
     
     return ''.join(chars)
 
-context = ""
-out = ""
-while 1:
-    inp = input("Напиши чота:")
-    context += inp + "\n"
-    out += generate_text(model, context, 100) + "\n"
-    print(out)
-    context += out + "\n"
+
+try:
+    while 1:
+        start_str = input("напиши чонить ")
+        if len(start_str) < 1:
+            start_str = " "
+        try:
+            generated_text = generate_text(model, start_str, length)
+            print(generated_text)
+        except KeyError as e:
+            print(f"молодой чоловек тут как бы {e}")
+except KeyboardInterrupt:
+    exit("ну ладно")
