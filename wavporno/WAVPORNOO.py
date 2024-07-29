@@ -15,14 +15,14 @@ import numpy as np
 import time
 start_time = time.time()
 
-orig_rate,orig = wavfile.read("orig.wav")
+orig_rate,orig = wavfile.read("resources/wav_porn_files/orig.wav")
 if orig.ndim == 2:
     print("Warning, Original file is Stereo. converting to mono..")
     orig = np.mean(orig, axis=1).astype(orig.dtype)
 orig = np.array(orig,dtype=float)
 
 if method < 3:
-    target_rate,target = wavfile.read("target.wav")
+    target_rate,target = wavfile.read("resources/wav_porn_files/target.wav")
     if target.ndim == 2:
         print("Warning, Target file is Stereo. converting to mono..")
         target = np.mean(target, axis=1).astype(target.dtype)
@@ -102,4 +102,4 @@ if method < 3:
     print(f"Modified samples:{mod_samples},Original samples:{orig_samples}")
     print(f"{modified_percent:.1f}% modified samples, {original_percent:.1f}% original samples")
 print(f"Executed in {time.time() - start_time} seconds")
-wavfile.write(f"out_method{method}.wav",orig_rate,np.array(output))
+wavfile.write(f"resources/wav_porn_files/out_method{method}.wav",orig_rate,np.array(output))
