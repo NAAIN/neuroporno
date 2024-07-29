@@ -2,5 +2,8 @@
 .venv
 .vscode
 neuroporno.code-workspace
-sosal credit bot
 LAN-Shit
+bot.session
+config.txt
+sosal credit bot.code-workspace
+__pycache__
