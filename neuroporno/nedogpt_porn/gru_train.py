@@ -9,13 +9,13 @@ embed_size = 128
 hidden_size = 128
 num_layers = 12
 #^^^^^^^^^^^^^^^^настройки НОВОЙ обучаемой модели(если доучивать то эти крутилки не учитываются)
-batch_size = 1000
+batch_size = 100
 learn_rate = 0.00001
 num_epochs = 12000
-datasetFile = "resources/dset.txt"
+datasetFile = "resources/gopota_files/dset.txt"
 ExistsModelPthName = ""
 #ExistsModelPthName = "models/GRU_degenerat_начал_чота_понимать.pth" #закомментируй чтобы создать новую модель
-LearnedPthName = "models/GRU_degenerat.pth"
+LearnedPthName = "neuroporno/models/GRU_degenerat.pth"
 start_str = "жопа"
 debug_in_name = True #Добавляет колво эпох, learn rate и параметры слоёв в название файла
 early_stop = False

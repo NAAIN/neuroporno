@@ -15463,3 +15463,6609 @@ SPIL, Taiwan (SPT)
 STATSChipPAC, China (SCC)
 ASE, Kaohsiung, Taiwan
 Solder ball pitch: 0.4 mm
+
+Wire Expression 2
+Уникальный чип, функцию которого может задать сам игрок с помощью собственного языка программирования.
+
+Синтаксис
+Синтаксис Expression 2 сильно изменился со времен прошлого Expression Chip, придется изучить немного больше команд, но это сделает ваши постройки намного более функциональными. Помните что как правило существует несколько способов написания кода, и задача может быть решена несколькими путями.
+
+В условных операторах Expression 2 числа принимаются за "ложь", если они равны 0, в ином случае они принимаются за "истину". Функции, которые по сути возвращают "истину" или "ложь", на деле возвращают 1 и 0 соответственно.
+
+Синтаксис	Пример	Упрощенный	Описание
+#	#это комментарий		Все, что находится за знаком # считается комментарием и не будет учитываться при обработке кода (оно будет проигнорировано при запуске чипа)
+#[коментарий]#	#[Это многострочный
+comment]#
+
+Все, что находится между знаками #[ и ]# считается комментарием и не будет учитываться при обработке кода (оно будет проигнорировано при запуске чипа)
+if () {}	if (A) {B=C}	if (A) {D=B}	Если значение (выражение) между круглыми скобками - "истина" то выполняются операции внутри фигурных скобок.
+else {}	else {A=B}		Должен следовать за if () {} или elseif () {}. Если предыдущее условие было ложным, то выполняются операции в фигурных скобках.
+Оператор не обязателен.
+
+elseif () {}	elseif (A) {B = C}		Должен следовать за if () {} или elseif () {}. Если предыдущее условие было ложным и условие в круглых скобках истинно, то выполняются операции в фигурных скобках.
+Оператор не обязателен.
+
+~	if(~Time & Time == 0) {DO stuff}		Изменялось ли значение на входе между выполнениями?
+$	Opitch = Pitch + ($Pitch *3)		Возвращает разницу между выполнениями в виде числа. (Работает только с переменными типа number, vector2, vector, vector4, angle)
+++	if(Count == 2 {Count++}	Count = Count + 1	Прибавляет 1 к заданной переменной.
+--	if(Count == 3){Count--}	Count = Count - 1	Вычитает 1 из заданной переменной.
++=	if(Count == 4){Count += 2}	Count = Count + 2	Прибавляет число после += к заданной переменной.
+-=	if(Count == 5) {Count -= 2}	Count = Count - 2	Вычитает число после -= из заданной переменной.
+( ? : )	D = (A ? B : C)		Если A истина то возвращает B иначе C. Замечание: конструкция A ?: B аналогична конструкции A ? A : B
+I	if (A I B) {C = 1}		Если A или B истина C=1.
+&	if (A & B) {C = 1}		Если A и B истина C=1.
+!	if (!A) {B = 1}		Должно предшествовать число. Возвращает 1 если A ложно (эквивалентно "A == 0").
+Должно предшествовать число.
+->	->Input or ->Output		Если вы используете его на входе, он возвращает 1, когда вход подсоединяется к чему либо. Если вы используете его на выходе, он возвращает количество входов присоединённых на выход.
+#ifdef	#ifdef entity():setAlpha(number)		Проверяет может ли данная функция выполняться на сервере.
+#else	#else entity():setModel(string)		Должно предшествовать #ifdef. Если данная функция не может использоваться на сервере запустится код после #else...
+#endif	#endif		Должно предшествовать #ifdef или #else .Закрывает выражение #ifdef.
+Переменные
+В E2, все входы, выходы и переменные должны быть объявлены с заглавной буквы:
+
+Синтаксис	Описание
+@persist variable	Это не будет работать потому, что переменная "variable" не будет прочитана как переменная, так как она объявлена со строчной буквы, а в Expression 2 переменные нужно обозначать с заглавной буквы.
+@persist Variable	Это будет работать, так как переменная "Variable" начинается с заглавной буквы.
+Выражение @trigger
+Выражение @trigger может выборочно разрешать и запрещать входам вызывать выполнение кода.Возможные значения: all/none, или список разрешенных входов.
+
+Синтаксис	Описание
+@trigger all	Всё по старому, изменение значения на входах всегда вызывает выполнение кода
+@trigger none	Изменение значения на входах никогда не вызывает выполнение кода, его вызывает только таймер, и.т.п. функции
+@trigger Time Button	Выполнение кода вызывается только при изменении значений на входах Time и Button
+Выражение @model
+Выражение @model устанавливает модель чипа при его первом создании.
+
+Пример: @model models/bull/gates/processor.mdl
+
+Циклы
+Синтаксис	Пример	Описание
+while () {}	while (A) {B++}	Любые инструкции в фигурных скобках будет повторяться, пока условие в круглых скобках истинно. Если условие ложно, инструкции будут пропущены и E2 будет продолжаться с конца цикла. Заметим, что условие проверяется только в самом начале каждого цикла.
+for () {}	for (I = A, B[, C]) {}	Добавляет значение C переменной для каждой итерации, пока она равна значению B. Если шаг C не указан, то он будет установлен на единицу. Обратите внимание, что А и В вычисляются только один раз - если они рассчитываются из переменных, что цикл устанавливает новые значения, это не изменит число итераций.
+foreach () {}	foreach(K,V:type=Table) {}	Проверяет  каждый элемент указанного типа в таблице. Назначает ключ к К и значение V. Элементы, которые не имеют определенного типа будут пропущены. Элементы могут быть добавлены, удалены или изменены, однако добавляемые элементы не будут обрабатываться в текущем цикле. Только цикл по строке индексов при использовании таблицы.
+continue	if (A) {continue}	Может быть использовано только в while/for/foreach цикле. Эта команда позволяет перейти к следующей итерации (немедленно вернуться к началу цикла), пропуская следующие инструкции.
+break	if (A) {break}	Может быть использовано только в while/for/foreach цикле. Эта команда позволяет немедленно выйти из цикла, пропуская следующие инструкции.
+Производительность
+Были проведены некоторые тесты в игре:
+
+~3.000.000/сек арифметических операций (+-*/) на числах, 2000 операций, 200 выполнений за 0.13сек
+
+~850.000/сек арифметических операций (+-*/) на векторах, 2000 операций, 100 выполнений за 0.23сек
+
+Горячие Клавиши Редактора
+Ctrl-Пробел Проверить (и переместить курсор на ошибку)
+Ctrl-S Сохранить
+Ctrl-Z Отменить
+Ctrl-Y Вернуть
+Ctrl-X Вырезать
+Ctrl-C Копировать
+Ctrl-V Вставить
+Ctrl-A Выделить Всё
+Ctrl-Up Прокрутить Вверх
+Ctrl-Down Прокрутить Вниз
+Ctrl-Left Прокрутить Влево
+Ctrl-Right Прокрутить Вправо
+Консольные команды
+Команда	Описание
+wire_expression2_model <model>	Вручную меняет модель чипа
+wire_expression2_reload	Перезагружает все расширения для E2, полезно для отладки своих расширений. Помните, что клиентские файлы в мультиплеере берутся из кэша g-mod.
+wire_expression2_debug 0/1	Включает режим отладки, который может быть полезен для разработчиков. Необходимо ввести "wire_expression2_reload" после изменения, чтобы сработало.
+wire_expression2_extension_enable <extension>	Включить определенное расширение
+wire_expression2_extension_disable <extension>	Выключить определенное расширение
+wire_expression2_unlimited 0/1	Включить/выключить ограничения по производительности
+wire_holograms_modelany 0/1	Позволяет брать любую модель для голограммы (0-выключить,1-включить)
+Типы
+Expression2 использует несколько типов данных. По понятным причинам, тут только верхушка всего айсберга.
+
+Сокращение	Типы
+N	Number(Числа)
+V2 / V / V4	2D / 3D / 4D Vector(Векторы)
+A	Angle(Углы)
+S	String(Строки)
+E	Entity(Объекты)
+R	Array(Массивы)
+T	Table(Таблицы)
+RD	Ranger Data(Рейнджеры)
+B	Bone(Кости)
+M2 / M / M4	2x2 / 3x3 / 4x4 Matrix(Матрицы)
+XWL	Wirelink
+C	Комплексные числа
+Q	Кватернионы
+Числа
+Описание
+Производит операции над числами
+
+Команды
+Функция	Возвращает	Описание
+N + N	N	Сложение
+N - N	N	Вычитание
+N * N	N	Умножение
+N / N	N	Деление
+N ^ N	N	Возведение в степень (2 ^ 3 = 8)
+N % N	N	Остаток от деления арумента 1 на аргумент 2. Примечание "-1 % 3 = 2"
+mod(N, N)	N	Остаток от деления арумента 1 на аргумент 2. Примечание "mod(-1, 3) = -1"
+sqrt(N)	N	Возвращает квадратный корень числа
+cbrt(N)	N	Возвращает кубический корень числа
+root(N, N)	N	Возвращает корень первого числа
+e()	N	Возвращает число Эйлера
+exp(N)	N	Возводит число Эйлера в степень аргумента (можно и e()^N, однако так быстрее)
+ln(N)	N	Возвращает логарифм числа N по основанию e (число Эйлера)
+log2(N)	N	Возвращает логарифм числа N по основанию 2 (двоичный)
+log10(N)	N	Возвращает логарифм числа N по основанию 10(десятичный)
+log(N,N)	N	Возвращает логарифм первого аргумента по основанию второго
+abs(N)	N	Возвращает модуль числа
+ceil(N)	N	Округляет аргумент до ближайшего большего целого числа [ceil(5.5) = 6]
+ceil(N,N)	N	Округляет аргумент с десятичной точностью до второго аргумента [ceil(5.05) = 5.1]
+floor(N)	N	Округляет аргумент до ближайшего меньшего целого числа [floor(5.5) =5]
+floor(N,N)	N	Округляет аргумент с десятичной точностью до второго аргумента [floor(5.14) = 5.1]
+round(N)	N	Округление [round(5.5) = 6; round(5.4) = 5]
+round(N,N)	N	Округление с десятичной точностью до второго аргумента
+int(N)	N	Возвращает целую часть числа (как floor)
+frac(N)	N	Возвращает дробную часть числа (как floor)
+clamp(N,N,N)	N	Если Arg1 <= Arg2 (минимальное) возвращает Arg2; если Arg1 >= Arg3 (максимальное) возвращает Arg3; иначе возвращает Arg1.
+inrange(N,N2,N3)	N	Возвращает 1 если N находится в интервале [N2; N3], иначе 0.
+sign(N)	N	Возвращает знак числа (-1,0,1) [sign(N) = N / abs(N) ]
+min(N,N)	N	Возвращает значение минимального аргумента
+min(N,N,N)	N	Возвращает значение минимального аргумента
+min(N,N,N,N)	N	Возвращает значение минимального аргумента
+max(N,N)	N	Возвращает значение максимального аргумента
+max(N,N,N)	N	Возвращает значение максимального аргумента
+max(N,N,N,N)	N	Возвращает значение максимального аргумента
+random()	N	Возвращает случайное число с плавающей точкой между 0 и 1 [0 <х <1]
+random(N)	N	Возвращает случайное число с плавающей точкой между 0 и указанным значением [0 <= X <]
+random(N,N)	N	Возвращает случайное число с плавающей точкой в указанном интервале [A < х < B]
+randint(N)	N	Возвращает случайное целое число между 1 и указанным значением [1 <= x <= a ]
+randint(N,N)	N	Возвращает случайное целое число в указанном интервале [a <= x <= b ]
+pi()	N	Возвращает постоянную ПИ
+toRad(N)	N	Переводит градусную меру угла в радианную
+toDeg(N)	N	Переводит радианную меру угла в градусную
+sin(N)	N	Возвращает синус числа N (из градусной меры)
+cos(N)	N	Возвращает косинус числа N (из градусной меры)
+tan(N)	N	Возвращает тангенс числа N (из градусной меры)
+asin(N)	N	Возвращает арксинус числа N (из градусной меры)
+acos(N)	N	Возвращает арккосинус числа N (из градусной меры)
+atan(N)	N	Возвращает арктангенс числа N (из градусной меры)
+sinh(N)	N	Возвращает гиперболический синус N (из градусной меры)
+cosh(N)	N	Возвращает гиперболический косинус числа N (из градусной меры)
+tanh(N)	N	Возвращает гиперболический тангенс числа N (из градусной меры)
+sinr(N)	N	Возвращает синус числа N (из радианной меры)
+cosr(N)	N	Возвращает косинус числа N (из радианной меры)
+tanr(N)	N	Возвращает тангенс числа N (из радианной меры)
+asinr(N)	N	Возвращает арксинус числа N (из радианной меры)
+acosr(N)	N	Возвращает арккосинус числа N (из радианной меры)
+atanr(N)	N	Возвращает арктангенс числа N (из радианной меры)
+atanr(N,N)	N	Возвращает арктангенс аргументов (ARG1 / ARG2), в радианах. Эта функция учитывает положительные / отрицательные аргументы, и аргументы близкие к 0
+sinhr(N)	N	Возвращает гиперболический синус числа N (из радианной меры)
+coshr(N)	N	Возвращает гиперболический косинус числа N (из радианной меры)
+tanhr(N)	N	Возвращает гиперболический тангенс числа N (из радианной меры)
+A = B	N	Присваивание (присвоить переменной A число B)
+A++	N	Увеличить на 1 (добавить к A единицу, упрощенно "A += 1")
+A--	N	Уменьшить на 1 (вычисть из A единицу, упрощенно "A -= 1")
+A += B	N	Увеличить на число (увеличить A на B, упрощенно "A = (A + B)")
+A -= B	N	Уменьшить на число (уменьшить A на B, упрощенно "A = (A - B)")
+A /= B	N	Делит A на B
+A %= B	N	Присваивает A остаток деления A на B
+A ^= B	N	Возводит A в степень B
+A == B	N	A равно B?
+A != B	N	А не равно В?
+A > B	N	А больше В?
+A < B	N	А меньше В?
+A >= B	N	А больше или равно В?
+A <= B	N	А меньше или равно В?
+Строки
+Описание
+Строки позволяют вам работать с текстом в E2. Необходимо для роты текстовых экранов.
+
+Пример работы
+String Example by Hitman271
+Команды
+Создает строку из помещенной в кавычки, например,"text goes here" Доступны операторы равенства (==) и неравенства, также как и конкатенации(+), для объединения строк и чисел в любом порядке. Операция конкатенации возвращает строку. Первый символ строки имеет номер 1. Отрицательные индексы отсчитываются от конца строки, в которой последний символ -1. Положительные индексы привязаны к длине строки.
+
+Функция	Возвращает	Описание
+S:index(N)	S	Возвращает N-нный символ из строки
+S:length()	N	Возвращает длину строки
+S:upper()	S	Делает все буквы у строки большими
+S:lower()	S	Делает все буквы у строки маленькими
+S:sub(N,N)	S	Возвращает подстроку, начиная с первого аргумента и заканчивая вторым
+S:left(N)	S	Возвращает первые N символов строки
+S:right(N)	S	Возвращает последние N символов строки
+S:find(S)	N	Возвращает 1 если в строке найдена подстрока S, или 0 если не найдена
+S:find(S, N)	N	Возвращает 1 если в строке найдена подстрока S начиная с Nого символа, или 0 если не найдена
+S:explode(S)	R	Разбивает строку через разделитель S и записывает результат в массив. Подробнее string.Explode
+S:repeat(N)	S	Повторяет N раз, возвращает S
+trim(S)	S	Убирает пробелы в начале и в конце строки
+S:trimLeft()	S	Убирает пробелы в начале строки
+S:trimRight()	S	Убирает пробелы в конце строки
+S:replace(1S,2S)	S	В строке S, находит все 1S, и заменяет их на 2S
+S:reverse()	S	Возвращает перевернутую строку S
+S:toNumber()	N	Переводит строку в числа
+toString(N)	S	Переводит число N в строку. (Числа могут быть преобразованы в строку без этой функции)
+toChar(N)	S	Возвращает ASCII-код из N, при условии что там помещен один знак.
+toByte(S)	N	Возвращает ASCII-код от первого знака в начале строки.
+toByte(S,N)	N	Возвращает ASCII-код знака из S, на позиции N
+S:match(S2,N)	R	Запускает функцию string.match(S, S2, N) garrysmod и возвращает в виде массива.
+S:match(S2)	R	Запускает функцию string.match(S, S2) garrysmod и возвращает в виде массива.
+S:matchFirst(S2,N)	S	Запускает функцию string.match(S, S2, N) garrysmod и первое совпадение или пустую строку в случае ошибки.
+S:matchFirst(S2)	S	Запускает функцию string.match(S, S2) garrysmod и первое совпадение или пустую строку в случае ошибки.
+Entity
+Описание
+Эти функции позволяют получать информацию и манипулировать объектами (такими как игроки или пропы), находящимися в игровом мире. Entity объекта можно получить несколькими способами: используя Target finder, Entity marker или специальными командами в самом E2.
+
+Since the expression collects the data directly from the entity, it is much faster to handle calculations from within the E2 than having a beacon-sensor send its information to the gate.
+
+A valid entity will return true in an if-statement. This is helpful for preventing LUA errors resulting from using entity commands on entities which have been destroyed.
+
+Примеры работы
+RPM Counter by Beer
+Remote Trail Maker (by OmicroN)
+Команды
+Только операторы для объектов равны и не равны. Кроме того, объект будет возвращать <span style="color:rgb(0,0,0);font-
+
+Функция 	Возвращает	Описание      |     Увеличить   ⇗
+entity(N)	E	Возвращает объект, числовой идентификатор объекта "ID"
+owner()	E	Действие будет происходить с владельцем ( owner ) чипа. ( так же, как entity():owner() )
+E:id()	N	Возвращает числовой идентификатор объекта "ID"
+noentity()	E	Возвращает пустой ентити
+"Всё равно, что корень из минус одного в линейной алгебре "sqrt(-1)" - не сложить, не поделить"
+
+E:type()	S	Возвращает тип объекта "E"
+E:model()	S	Возвращает модель объекта "E"
+E:owner()	E	Возвращает владельца объекта "E"
+E:name()	S	Возвращает имя объекта "E"
+E:steamID()	S	Возвращает Steam ID игрока (на данный момент с ошибками)
+E:pos()	V	Возвращает позицию объекта "E"
+E:eye()	V	Возвращает позицию взгляда игрока или же направление объекта в переднюю сторону
+E:eyeTrace()	RD	Равносильно "rangerOffset(999999, E:shootPos(), E:eye())", но быстрее (требует меньше операций)
+E:shootPos()	V	Возвращает позицию выстрела игрока, точка, точно в которой находится камера игрока
+E:aimEntity()	E	Возвращает объект на который смотрит игрок
+E:aimBone()	B	Возвращает кость на которую смотрит игрок
+E:aimPos()	V	Возвращает позицию взгляда игрока (не сторону,в отличие от "E:eye()" )
+Равносильно "rangerOffset(999999, E:shootPos(), E:eye()):pos()"
+
+E:aimNormal()	V	Возвращает нормальный вектор направления прицела игрока
+E:frags()	N	Возвращает количество убийств игрока
+E:team()	N	Возвращает  номер команды игрока
+teamName(N)	S	Возвращает имя команды связанной с номером
+E:forward()	V	Возвращает переднее направление объекта
+E:right()	V	Возвращает правое направление объекта
+E:up()	V	Возвращает верхнее направление объекта
+E:vel()	V	Возвращает вектор скорости объекта
+E:velL()	V	Возвращает локальный вектор скорости объекта
+E:boxCenter()	V	Возвращает координату середины ограничивающей рамки объекта в пространстве самого объекта
+E:boxCenterW()	V	Возвращает координату середины ограничивающей рамки объекта в пространстве мира
+Равносильно: "E:pos() + E:boxCenter():rotate(E:angles())"
+
+E:boxMax()	V	Возвращает максимальную высоту ограничивающей рамки объекта(самый высокий угол)
+E:boxMin()	V	Возвращает минимальную высоту ограничивающей рамки объекта(самый низкий угол)
+E:boxSize()	V	Возвращает вектор размера ограничивающей рамки объекта(длинна,ширина,высота)
+E:toWorld(V)	V	Преобразует, локальный объекту Е, вектор V в систему координат мира.
+Равносильно: "E:pos() + V:rotate(E:angles())"
+
+E:toLocal(V)	V	Преобразует вектор V из пространства мира в пространство объекта Е
+Равносильно: "V:rotate(-E:angles()) - E:pos()"
+
+E:toWorld(A)	A	Преобразует, локальный объекту Е, угол в угол в пространстве мира
+E:toLocal(A)	A	Преобразует угол из пространства мира в локальный угол объекта Е
+E:angVel()	A	Возвращает угловую скорость объекта Е
+E:angVelVector()	V	Returns rotation axis, velocity and direction given as the vector's direction, magnitude and sense
+E:angles()	A	Возвращает углы наклона объекта в пространстве мира
+E:radius()	N	Возвращает размер объекта (хоть и не точно, но это полезно)
+E:height()	N	Возвращает высоту игрока или NPC
+E:bearing(V)	N	Gets the bearing from the entity to the vector
+E:elevation(V)	N	Gets the elevation from the entity to the vector
+E:direction(V)	A	Gets the elevation and bearing from the entity to the vector
+E:health()	N	Возвращает здоровье объекта
+E:armor()	N	Возвращает броню обьекта
+E:mass()	N	Возвращает массу объекта
+Хочу заметить, что масса в source измеряется в килограммах.
+
+E:timeConnected()	N	Возвращает время в течении которого игрок находится на сервере
+E:massCenter()	V	Возвращает центр масс объекта в пространстве координат мира
+E:massCenterL()	V	Возвращает центр масс объекта в пространстве координат объекта (локальный вектор)
+Равносильно: "E:toLocal(E:massCenter())"
+
+Равносильно: "E:massCenter():rotate(-E:angles()) - E:pos()"
+
+E:setMass(N)		Устанавливает массу объекта
+(работает в промежутке [0.001; 50,000])
+
+Хочу заметить, что масса в source измеряется в килограммах.
+
+E:inertia()	V	Получает основные компоненты тензора инерции сущности в форме ( Ixx, Iyy, Izz )
+E:applyForce(V)		К объекту применяется сила, заданная вектором V
+Хочу заметить, что модуль(длинна) этого вектора будет равен силе, которая измеряется в ньютонах
+
+E:applyOffsetForce(V1,V2)		Аналогично "applyForce", только сила V1 применяется не в центре масс, а в указанном векторе V2
+E:applyAngForce(A)		К объекту применяется крутящий момент
+E:applyTorque(V)		Applies torque according to the given vector, representing the torque axis, magnitude and direction
+E:isPlayer()	N	Является ли этот объект игроком?
+E:isOnFire()	N	Этот объект горит?
+E:isWeapon()	N	Этот объект оружие?
+E:isNPC()	N	Этот объект NPC?
+E:isFrozen()	N	Этот объект заморожен?
+E:isVehicle()	N	Этот объект транспорт?
+E:inVehicle()	N	Этот объект(игрок) в транспорте?
+E:isWorld()	N	Этот объект - объект мира?
+E:isOnGround()	N	Опирается ли объект на что-то?(работает только на игроков и NPC)
+E:isUnderWater()	N	Этот объект под водой?
+E:isPlayerHolding()	N	Этот объект держит игрок?
+E:isAlive()	N	Этот объект(игрок или NPC) жив?
+E:isCrouch()	N	Игрок присел?
+E:inNoclip()	N	Игрок в режиме хождения сквозь стены?
+E:keyAttack1()	N	Нажимает ли игрок кнопку "огонь"?
+E:keyAttack2()	N	Нажимает ли игрок кнопку "альтернативный огонь?
+E:keyUse()	N	Нажимает ли игрок кнопку "использовать"? 
+E:hintDriver(S,N)	N	Displays a hint popup to the driver of vehicle E, with message S for N seconds (N being clamped between 0.7 and 7). Returns 1 if the hint has been sent.
+E:printDriver(S)	N	Пишет S в чат водителя машины E. Возвращает 1, если текст был написан, 0, если нет.
+E:driver()	E	Возвращает объект игрока, сидящего в транспорте E
+E:passenger()	E	Возвращает пассажира машины, если он там один, в одноместных вернёт водителя.
+E:lockPod(N)		Значение 1 разрешает садиться в транспорт E, значение 0 запрещает садиться в транспорт E
+E:ejectPod()		Выгоняет игрока из транспорта
+E:killPod()		Убивает игрока в транспорте
+E:weapon()	E	Возвращает объект оружия, которое сейчас держит игрок
+E:clip1()	N	Возвращает количество патронов у игрока
+E:clip2()	N	Возвращает количество альтернативных патронов
+E:primaryAmmoType()	S	Возвращает тип патронов 
+E:secondaryAmmoType()	S	Возвращает тип альтернативных патронов
+E:ammoCount(S)	N	Returns the amount of stored ammo of type S on player E, excluding current clip
+E:removeTrails()		Убирает хвосты/трейлы с объекта
+E:setTrails(N,N,N,S,V,N)		Задает объекту трейл, значения:
+"объект привязки:(ширина начала, ширина конца, длинна, материал, цвет, прозрачнось"
+E:lookupAttachment(string attachmentName)	N	Returns entity's attachment ID associated with attachmentName
+E:attachmentPos(attachmentID)	V	Returns entity's attachment position associated with attachmentID
+E:attachmentAng(attachmentID)	A	Returns entity's attachment angle associated with attachmentID
+E:attachmentPos(string attachmentName)	V	Same as E:attachmentPos(E:lookupAttachment(attachmentName))
+E:attachmentAng(string attachmentName) || A|| Same as E:attachmentAng(E:lookupAttachment(attachmentName))
+
+Векторы
+Описание
+Vectors are now properly implemented in the Expression 2, which means that they are as easy to work with as numbers. For those that know what vectors are, and how to use them, this is a great tool for creating many things.
+
+2D and 4D vectors are also supported by E2. These include all the standard functions of 3D vectors listed here. If you're doing 2D vector operations, you can now do things much more efficiently. 4D vectors work in conjunction with matrices, and can be used as homogeneous representations of 3D vectors.
+
+Operational functions can be used between numbers and vectors, e.g. N*V. Note that operations cannot be performed between two vectors of different size, for example multiplication between a 2D and a 3D vector.
+
+Related Examples
+Velocity Stabilization by fishface60
+Simple XYZ Target Vector by Gunnanmon
+GPS by fishface60
+Команды
+Functions specific to 2D vectors
+
+Команда	Возвращает	Описание
+vec2(N,N)	V2	Создает двухмерный вектор
+vec2()	V2	Создает двухмерный вектор
+Равносильно: "vec2(0,0)" или "vec2(0)"
+
+Хочу заметить, что выражение "vec2( N , N )" полностью идентично выражению "vec2( N )"
+
+vec2(V)	V2	Конвертирует 3D вектор в 2D (z опускается)
+vec2(V4)	V2	Конвертирует 4D вектор в 2D (z и w опускаются)
+V2:cross(V2)	N	Gets the 2D vector cross product/wedge product
+shift(V2)	V2	Swaps the vector's x,y components
+V2:rotate(N)	V2	Поворачивает вектор на заданный аргумент N (из градусной меры)
+V2:toAngle()	N	Преобразует вектор в угол (в промежутке от -180 до 180)
+V:dehomogenized()	V2	Converts a 2D homogeneous vector (x,y,w) into a 2D cartesian vector
+3D Vector Commands
+Functions specific to 3D vectors
+
+Function	Returns	Description
+vec(N,N,N)	V	Создаёт трёхмерный вектор
+vec()	V	Создаёт трёхмерный вектор
+Равносильно: "vec(0,0,0)"
+
+vec(V2)	V	Преобразует двухмерный вектор в трёхмерный, при этом координате "Z" задаётся значение "0"
+Равносильно: "vec(V2:x(),V2:y(),0)"
+
+vec(V2,N)	V	Преобразует двухмерный вектор в трёхмерный, при этом координате "Z" задаётся значение NРавносильно: "vec(V2:x(),V2:y(),N)"
+vec(V4)	V	Преобразует четырёхмерный вектор в трёхмерный, пот этом координата w опускается
+Равносильно: "vec(V4:x(),V4:y(),V4:z())"
+
+vec(A)	V	Преобразует углы в вектор
+Равносильно: "vec(A:pitch(),A:yaw(),A:roll())"
+
+V:cross(V)	V	Gets the 3D vector cross product
+shiftL(V)	V	Shifts the vector's components left: shiftL( x,y,z ) = ( y,z,x )
+shiftR(V)	V	Shifts the vector's components right: shiftR( x,y,z ) = ( z,x,y )
+V:rotate(A)	V	Вращает вектор по углам А
+V:rotate(N,N,N)	V	Вращает вектор по углам ang(N,N,N)
+V:toAngle()	A	Преобразует вектор в углы, которые указывают направление в система отсчета мира
+V4:dehomogenized()	V	Converts a 3D homogeneous vector (x,y,z,w) into a 3D cartesian vector
+V:isInWorld()	N	Returns 1 if the position vector is within the world, 0 if not
+4D Vector Commands
+Functions specific to 4D vectors. From a mathematics standpoint these are treated as 4D Cartesian vectors, where the 4th component is referred to as "w".
+
+Function	Returns	Description
+vec4(N,N,N,N)	V4	Makes a 4D vector
+vec4()	V4	Same as vec4(0,0,0,0)
+vec4(V2)	V4	Converts a 2D vector into a 4D vector (the z and w components are set to 0)
+vec4(V2,N,N)	V4	Converts a 2D vector into a 4D vector (the z and w components are set to the second and third arguments)
+vec4(V2,V2)	V4	Creates a 4D vector from two 2D vectors
+vec4(V)	V4	Converts a 3D vector into a 4D vector (the w component is set to 0)
+vec4(V,N)	V4	Converts a 3D vector into a 4D vector (the w component is set to the second argument)
+shiftL(V4)	V4	Shifts the vector's components left: shiftL( x,y,z,w ) = ( y,z,w,x )
+shiftR(V4)	V4	Shifts the vector's components right: shiftR( x,y,z,w ) = ( w,x,y,z )
+Common Vector Commands
+Functions that apply to 2D and 3D vectors. They are written here in terms of 3D vectors, but apply to 2D and 4D vectors in the same way, also returning 2D or 4D vectors where applicable.
+
+Function	Returns	Description
+ceil(V)	V	Округляет XYZ к ближайшему числу
+ceil(V,N)	V	Rounds XYZ up to argument 2's decimal precision
+floor(V)	V	Rounds XYZ down to the nearest integer
+floor(V,N)	V	Rounds XYZ down to argument 2's decimal precision
+round(V)	V	Rounds XYZ to the nearest integer
+round(V,N)	V	Rounds XYZ to argument 2's decimal precision
+mod(V,N)	V	Returns the remainder after XYZ have been divided by argument 2
+mod(V,V)	V	Returns the remainder after the components of vector 1 have been divided by the components of vector 2
+clamp(V,V,V)	V	Clamps vector 1's XYZ between the XYZ of vector 2(min) and vector 3(max)
+clamp(V,N,N)	V	Clamps vector 1's length between argument 2(min) and argument 3(max)
+min(V,V)	V	Returns the vector with the smallest length
+max(V,V)	V	Returns the vector with the greatest length
+mix(V,V,N)	V	Combines vector 1's XYZ with vector 2's XYZ by a proportion given by argument 3 (between 0 and 1)
+positive(V)	V	Returns a vector containing the positive value of each vector component, equivalent to abs(N)
+V:length()	N	Gets the length of the vector
+V:length2()	N	Gets the squared length of the vector
+V:distance(V)	N	Gets the distance between vectors
+V:distance2(V)	N	Gets the squared distance between vectors
+V:normalized()	V	Gets the normalized vector
+V:dot(V)	N	Gets the vector dot (scalar) product
+V:x()	N	Выводит из вектора x координату
+V:y()	N	Выводит из вектора y координату
+V:z()	N	Выводит из вектора z координату
+V:w()	N	Выводит из вектора w координату
+V:setX(N)	V	Returns a copy of the vector with X replaced (use as Vec = Vec:setX(...))
+V:setY(N)	V	Returns a copy of the vector with Y replaced (use as Vec = Vec:setY(...))
+V:setZ(N)	V	Returns a copy of the vector with Z replaced (use as Vec = Vec:setZ(...))
+V:setW(N)	V	Returns a copy of the vector with W replaced (use as Vec = Vec:setW(...))
+V:toString()	S	Gets the vector nicely formatted as a string "[X,Y,Z]"
+Matrix
+Developed by: Jimlad
+
+Description
+2x2, 3x3 and 4x4 matrices are now supported in Expression 2. These are for more advanced manipulations involving vectors and numbers. As with vectors, for those with the relevant knowledge these can be very useful tools.
+
+Basic operations supported:
+
+Matrix addition and subtraction
+Multiplication by scalars, vectors and matrices
+Division by a scalar
+Exponentiation (only integers between -1 and 2)
+Delta of a matrix (returns a matrix)
+NOTES:
+
+Similarly to vectors, 3x3 matrix commands are referred to using "matrix", whereas 2x2 and 4x4 matrix commands use "matrix2" and "matrix4"
+
+The "set" and "swap" functions are like the 3D vector "set" functions; they do not affect the original matrix.
+
+Remember that operations will only work on vectors/matrices of a similar size. You cannot, for example, multiply a 3x3 matrix by a 2D vector. Also, all vectors are treated as column vectors for the purposes of matrices, so M*V will return a vector but V*M is undefined.
+
+2x2 Matrix Commands
+Functions specific to 2x2 matrices
+
+Function	Returns	Description
+identity2()	M2	Creates a 2x2 identity matrix
+matrix2()	M2	Creates a 2x2 zero matrix
+matrix2(N,N,N,N)	M2	Creates a matrix with values in order (i.j) of: (1,1), (1,2), (2,1), (2,2)
+matrix2(V2,V2)	M2	Creates a matrix with vectors by columns
+matrix2(M)	M2	Converts a 3x3 matrix into a 2x2 matrix - all (i,3) and (3,j) are omitted
+matrix2(M4)	M2	Converts a 4x4 matrix into a 2x2 matrix - all (i,3), (i,4), (3,j) and (4,j) are omitted
+M2:swapRows()	M2	Swaps rows
+M2:swapColumns()	M2	Swaps columns
+M2:setRow(N,N,N)	M2	Sets the values of a row. The first argument given specifies the row(j), the following arguments are the values 1j, 2j
+M2:setRow(N,V2)	M2	Sets the values of a row. The first argument given specifies the row, the vector contains the values to set
+M2:setColumn(N,N,N)	M2	Sets the values of a column. The first argument given specifies the column(i), the following arguments are the values i1, i2
+M2:setColumn(N,V2)	M2	Sets the values of a column. The first argument given specifies the column, the vector contains the values to set
+3x3 Matrix Commands
+Functions specific to 3x3 matrices
+
+Function	Returns	Description
+identity()	M	Creates a 3x3 identity matrix
+matrix()	M	Creates a 3x3 zero matrix
+matrix(N1,N2... N9)	M	Creates a matrix with 9 values in the following order (i.j): (1,1), (1,2), (1,3), (2,1) etc.
+matrix(V,V,V)	M	Creates a matrix with vectors by columns
+matrix(M2)	M	Converts a 2x2 matrix into a 3x3 matrix - all (i,3) and (3,j) are filled with 0's
+matrix(M4)	M	Converts a 4x4 matrix into a 3x3 matrix - all (i,4) and (4,j) are omitted
+M:swapRows(N,N)	M	Swaps the two rows specified
+M:swapColumns(N,N)	M	Swaps the two columns specified
+M:setRow(N,N,N,N)	M	Sets the values of a row. The first argument given specifies the row(j), the following arguments are the values 1j, 2j, 3j
+M:setRow(N,V)	M	Sets the values of a row. The first argument given specifies the row, the vector contains the values to set
+M:setColumn(N,N,N,N)	M	Sets the values of a column. The first argument given specifies the column(i), the following arguments are the values i1, i2, i3
+M:setColumn(N,V)	M	Sets the values of a column. The first argument given specifies the column, the vector contains the values to set
+M:setDiagonal(N,N,N)	M	Sets the elements of the leading diagonal
+M:setDiagonal(V)	M	Sets the elements of the leading diagonal from the components of a vector
+matrix(E)	M	Creates a reference frame matrix from an entity's local direction vectors by columns in the order ( x, y, z )
+matrix(A)	M	Returns a 3x3 reference frame matrix as described by the angle A. Multiplying by this matrix will be the same as rotating by the given angle.
+M:x()	V	Returns the local x direction vector from a 3x3 coordinate reference frame matrix ( same as M:column(1) )
+M:y()	V	Returns the local y direction vector from a 3x3 coordinate reference frame matrix ( same as M:column(2) )
+M:z()	V	Returns the local z direction vector from a 3x3 coordinate reference frame matrix ( same as M:column(3) )
+mRotation(V,N)	M	Creates a 3x3 rotation matrix, where the vector is the axis of rotation, and the number is the angle (anti-clockwise) in degrees. Example*: to rotate a vector (7,8,9) by 50 degrees about the axis (1,1,0), you would write V = mRotation(vec(1,1,0), 50) * vec(7,8,9)
+* If you want to create a rotation matrix about the axes (1,0,0), (0,1,0) or (0,0,1), either use the V:rotate function, or construct a standard rotation matrix.
+
+4x4 Matrix Commands
+Functions specific to 4x4 matrices
+
+Function	Returns	Description
+identity4()	M4	Creates a 4x4 identity matrix
+matrix4()	M4	Creates a 4x4 zero matrix
+matrix4(N1,N2... N16)	M4	Creates a matrix with 16 values in the following order (i.j): (1,1), (1,2), (1,3), (1,4), (2,1) etc.
+matrix4(V4,V4,V4,V4)	M4	Creates a matrix with vectors by columns
+matrix4(M2)	M4	Converts a 2x2 matrix into a 4x4 matrix - all (i,3), (i,4), (3,j) and (4,j) are filled with 0's
+matrix4(M2,M2,M2,M2)	M4	Constructs a 4x4 matrix from four 2x2 matrices
+matrix4(M)	M4	Converts a 3x3 matrix into a 4x4 matrix - all (i,4) and (4,j) are filled with 0's
+M4:swapRows(N,N)	M4	Swaps the two rows specified
+M4:swapColumns(N,N)	M4	Swaps the two columns specified
+M4:setRow(N,N,N,N,N)	M4	Sets the values of a row. The first argument given specifies the row(j), the following arguments are the values 1j, 2j, 3j, 4j
+M4:setRow(N,V4)	M4	Sets the values of a row. The first argument given specifies the row, the vector contains the values to set
+M4:setColumn(N,N,N,N,N)	M4	Sets the values of a column. The first argument given specifies the column(i), the following arguments are the values i1, i2, i3, i4
+M4:setColumn(N,V4)	M4	Sets the values of a column. The first argument given specifies the column, the vector contains the values to set
+M4:setDiagonal(N,N,N,N)	M4	Sets the elements of the leading diagonal
+M4:setDiagonal(V4)	M4	Sets the elements of the leading diagonal from the components of a vector
+matrix4(E)	M4	Creates a 4x4 reference frame matrix from an entity's local direction vectors by columns in the order (x, y, z, pos), with the bottom row (0,0,0,1)
+matrix4(A)	M4	Returns a 4x4 reference frame matrix as described by the angle A. Multiplying by this matrix will be the same as rotating by the given angle.
+matrix4(A,V)	M4	Returns a 4x4 reference frame matrix as described by the angle A and the position V. Multiplying by this matrix will be the same as rotating by the given angle and offsetting by the given vector.
+M4:x()	V	Returns the local x direction vector from a 4x4 coordinate reference frame matrix ( same as M:column(1) )
+M4:y()	V	Returns the local y direction vector from a 4x4 coordinate reference frame matrix ( same as M:column(2) )
+M4:z()	V	Returns the local z direction vector from a 4x4 coordinate reference frame matrix ( same as M:column(3) )
+M4:pos()	V	Returns the position vector from a 4x4 coordinate reference frame matrix ( same as M:column(4) )
+inverseA(M4)	M4	Finds the matrix inverse of a standard 4x4 affine transformation matrix ( the type created by matrix4(E) ). This should only be used on matrices with a particular format, where the top left 3x3 specifies rotation, the rightmost 3-column specifies translation, and the bottom row is (0,0,0,1)
+Стандартные команды для матриц
+Функции, которые работают для матриц 2x2, 3x3 and 4x4. В данном случае написано для матриц 3*3, но применимы для матриц 2х2 и 4х4.
+
+Операции возвращают вектора/матрицы того же размера. Например, функция row() возвращает 2D вектор.
+
+Функция	Возвращает	Описание
+M:row(N)	V	Возвращает строку, как вектор
+M:column(N)	V	Возвращает столбец, как вектор
+M:element(N,N)	N	Возвращает элемент с индексами(i,j)
+M:setElement(N,N,N)	M	Устанавливает значение элемента. Первые 2 аргумента - индексы (i,j), третий элемент - значение, которое надо вставить.
+M:swapElements(N,N,N,N)	M	Меняет 2 элемента местами ( i1, j1, i2, j2 )
+diagonal(M)	V	Returns a vector comprising the elements along the leading diagonal
+trace(M)	N	Returns the trace of a matrix
+det(M)	N	Returns the determinant of a matrix (Does not work for 4x4 matrices)
+transpose(M)	M	Returns the transpose of a matrix
+adj(M)	M	Returns the adjugate of a matrix (Does not work for 4x4 matrices)	
+NOTE: To get the inverse of a matrix, simply raise the matrix to the power of -1. Use this sparingly as it can be computationally expensive! Remember that if your matrix is orthogonal (e.g. rotation matrices), the inverse is equal to the transpose, so use the transpose instead if you can. Inverse is not available for 4x4 matrices. Instead, see usage of the inverseA(M4) function.
+
+Angle
+Description
+Like 3 different directions can be expressed as a Vector, the angles of Pitch, Yaw and Roll can be expressed as an angle Vector. This in the least has the advantage that when performing functions which use angles, such as vector rotation or creating vectors from angles, you don't have to write the Pitch, Yaw and Roll components, only the Angle.
+
+Commands
+Function	Returns	Description
+ang(N,N,N)	A	Makes an angle
+ang()	A	Same as ang(0,0,0)
+ang(V)	A	Changes a vector variable into an angle variable
+ceil(A)	A	Rounds PYR up to the nearest integer
+ceil(A,N)	A	Rounds PYR up to argument 2's decimal precision
+floor(A)	A	Rounds PYR down to the nearest integer
+floor(A,N)	A	Rounds PYR down to argument 2's decimal precision
+round(A)	A	Rounds PYR to the nearest integer
+round(A,N)	A	Rounds PYR to argument 2's decimal precision
+mod(A,N)	A	Returns the remainder after PYR have been divided by argument 2
+mod(A,A)	A	Returns the remainder after the components of angle 1 have been divided by the components of angle 2
+clamp(A,A,A)	A	Clamps angle 1's PYR between the PYR of angle 2(min) and angle 3(max)
+clamp(A,N,N)	A	Clamps angle 1's PYR between argument 2(min) and argument 3(max)
+mix(A,A,N)	A	Combines angle 1's PYR with angle 2's PYR by a proportion given by argument 3 (between 0 and 1)
+shiftL(A)	A	Shifts the angle's components left: shiftL( p,y,r ) = ( y,r,p )
+shiftR(A)	A	Shifts the angle's components right: shiftR( p,y,r ) = ( r,p,y )
+angnorm(A)	A	Gets the normalized angle of an angle
+angnorm(N)	N	Gets the normalized angle of a number
+A:pitch()	N	Gets the pitch of the angle
+A:yaw()	N	Gets the yaw of the angle
+A:roll()	N	Gets the roll of the angle
+A:setPitch(N)	A	Returns a copy of the angle with Pitch replaced (use as Ang = Ang:setPitch(...))
+A:setYaw(N)	A	Returns a copy of the angle with Yaw replaced (use as Ang = Ang:setYaw(...))
+A:setRoll(N)	A	Returns a copy of the angle with Roll replaced (use as Ang = Ang:setRoll(...))
+A:toString()	S	Gets the angle nicely formatted as a string "[P,Y,R]"
+A:toVector()	V	Removed in r1340. Use vec(A) instead.
+A:forward()	V	Gets the forward vector of the angle.
+A:right()	V	Gets the right vector of the angle.
+A:up()	V	Gets the up vector of the angle.
+Table
+Description
+Tables are a way to create dynamic variables, store large numbers of data points and so on. It may be thought of as a list of data, where each bit of data is addressed with an index string. This is a string which is unique to each element of a datatype (a number element and a vector element may have identical indices without problems, but two number elements cannot). Tables can contain any datatype except table and array.
+
+Assigning one table variable to equal another will make them both refer to the same table. If you want to make a new copy of a table which will thereafter be set and retrieved from independently of the original table, you must use clone().
+Related Examples
+Table-RAM by Magos Mechanicus
+Commands
+In the interest of brevity, some commands which have many variants are shown as a pattern. <type> may be substituted with the capitalized name of any supported datatype, and * is the corresponding datatype symbol. For instance, R:push<type>(*) can mean R:pushNumber(N), or R:pushString(S).
+
+Function	Returns	Description
+table()	T	Creates an empty table
+T:clone()	T	Creates an independent copy of a table
+T:count()	N	Returns the number of used indexes in the table
+invert(R)	T	Returns a lookup table for R. Usage: Index = T:number(toString(Value))
+Don't overuse this function, as it can become expensive for arrays with > 20 entries!
+invert(T)	T	Returns a lookup table for T. Usage: Key = T:string(toString(Value))
+Don't overuse this function, as it can become expensive for tables with > 10 entries!
+T:<type>(S)	N	Retrieves the requested datatype element from the indexed string. Returns the default value for the datatype if the index is nil.
+T:set<type>(S,*)		Saves the value as a table element with the specified index string
+Array
+Thanks to: Erkle
+
+Description
+Same as table, but with much less memory footprint and is numerically indexed instead. It is similar to E1's packet support. Arrays can contain any datatype except table and array.
+
+Related Examples
+Array-RAM by GUN
+Commands
+In the interest of brevity, some commands which have many variants are shown as a pattern. <type> may be substituted with the capitalized name of any supported datatype, and * is the corresponding datatype symbol. For instance, R:push<type>(*) can mean R:pushNumber(N), or R:pushString(S).
+
+Function	Returns	Description
+array()	R	Creates an empty array
+R:clone()	R	Creates an independant copy of an array
+R:count()	N	Returns the number of used indexes in the array
+R:sum()	N	Adds all numbers in the array together and returns result
+R:concat()	S	Combines all strings and returns result
+R:concat(S)	S	Combines all strings with specified string in between and returns result
+R:average()	N	Gives the average of all numbers in array
+R:min()	N	Returns the smallest number in array
+R:minIndex()	N	Returns the index of the smallest number in array
+R:max()	N	Returns the largest number in array
+R:maxIndex()	N	Returns the index of the largest number in array
+R:<type>(N)	*	Retrieves the array element indexed with the number. Returns the default value for the datatype if the element is nil.
+R:set<type>(N,*)		Saves the datatype as an array element with the specified index number
+R:push<type>(*)		Saves the data at the end of the array
+R:pop<type>()	*	Deletes and returns the last entry in the array. Be sure not to use popNumber() on a vector or similar, as the data may be lost
+R:pop()		Deletes the last entry in the array
+R:unshift<type>(*)		Adds the data to the beginning of the array. Will move all other entries up one address
+R:shift<type>()	*	Deletes and returns the first element of the array, moving other entries down one address to compensate.
+R:shift()		Удаляет первый элемент массива; all other entries will move down one address
+R:insert<type>(N,*)	*	Inserts the data into the specified index; all entries after this index will move up to compensate
+R:remove<type>(N)	*	Deletes and returns the specified entry, moving subsequent entries down to compensate
+R:remove(N)		Deletes the specified entry, moving subsequent entries down to compensate
+Bone
+Developed by: TomyLobo
+
+Описание
+Это расширение добавляет в Е2 поддержку энтити-костей. Костью может быть любая часть теля любого регдолла (голова, левая рука, правая нога, и т. д.).
+Вы можете получит позицию костей, ориентацию, скорость, очень похоже на обычные пропы (хотя некоторых вещей не хватает).
+
+Функции массивов и таблиц для костей так же предостовляются.
+
+Связанные примеры
+Команды
+Функция	Возвращает	Описание
+E:bone(N)	B	Возвращает N-ую кость энтити Е
+E:bones()	R	Возвращает массивом все кости содержащиеся в энтити Е. Первый элемент этого массива имеет индекс 0!
+E:boneCount()	N	Возвращает количество костей энтити Е.
+nobone()	B	Возвращает недействительную(?) кость.
+E:aimBone()	B	Возвращает ту кость, на которую смотрит игрок.
+B:entity()	E	Возващает ту энтити, к которой принадлежит кость В.
+B:index()	N	Возвращает индекс кости в своей энтити. Возвращает -1 если кость не действительна(?) или имеет место ошибка.
+B:pos()	V	Возвращает позицию кости В
+B:forward()	V	Возвращает вектор описывающий направление кости вперёд.
+B:right()	V	Возвращает вектор описывающий направление кости вправо.
+B:up()	V	Возвращает вектор описывающий направление кости вверх.
+B:vel()	V	Возвращает вектор скорости кости В.
+B:velL()	V	Возвращает вектор скорости кости В в локальной системе координат.
+B:toWorld(V)	V	Трансформирует вектор из локальной системы координат кости в систему координат мира.
+B:toLocal(V)	V	Трансформирует вектор из системы координат мира в локальную систему координат кости.
+B:angVel()	A	Возвращает угловую скорость кости В.
+B:angles()	A	Возвращает pitch, yaw и roll кости В.
+B:bearing(V)	N	Returns the bearing (yaw) from B to V
+B:elevation(V)	N	Returns the elevation (pitch) from B to V
+B:mass()	N	Returns B's mass
+B:massCenter()	V	Returns B's Center of Mass
+B:massCenterL()	V	Returns B's Center of Mass in local coordinates
+B:setMass(N)		Sets B's mass (between 0.001 and 50,000)
+B:inertia()	V	Gets the principal components of B's inertia tensor in the form vec(Ixx, Iyy, Izz)
+B:applyForce(V)		Applies force to B according to V's direction and magnitude
+B:applyOffsetForce(V,V2)		Applies force to B according to V from the location of V2
+B:applyAngForce(A)		Applies torque to B according to A
+B:isFrozen()	N	Returns 1 if B is frozen, 0 otherwise
+Wirelink
+Description
+Wirelinks are an alternative to normal wires that offer a number of advantages. Any number of inputs or outputs on a component can be manipulated with one Wirelink, and you can also use it to retrieve the entity of a wirelinked component. Since all Wirelinks are capable of two-way communication, wirelinks are not clear-cut inputs or outputs. As such, to avoid ambiguity wirelinks which the expression should be able to manipulate are always declared in the @inputs of the expression. To connect this input to another component, you must use the Wirelink tool on the component to create a new output on it of the type Wirelink, then wire the input to the output as normal.
+
+Wirelink is not yet officially supported
+
+Related Examples
+Wirelink Example by Hitman271
+Vector and Entity Wirelink Testing by fishface60
+Radar by Coder0xff
+Commands
+Equal and Not Equal operators are available. XWL here means the Wirelink input.
+
+Function	Returns	Description
+XWL:isHiSpeed()	N	Returns true if the linked component is high-speed capable.
+XWL:entity()	E	Returns the entity of the linked component.
+XWL:hasInput(S)	N	Returns true if the linked component has an input of the specified name.
+XWL:hasOutput(S)	N	Returns true if the linked component has an output of the specified name.
+XWL:setNumber(S,N)		Sets the component's input of the specified name equal to the number.
+XWL:number(S)	N	Retrieves the component's output of the specified name.
+XWL:setVector(S,V)		Sets the component's input of the specified name equal to the vector.
+XWL:vector(S)	V	Retrieves the component's output of the specified name.
+XWL:setString(S,S)		Sets the component's input of the specified name equal to the string.
+XWL:string(S)	S	Retrieves the component's output of the specified name.
+XWL:setXyz(V)		Sets the X/Y/Z to the corresponding values in the vector.
+XWL:xyz()	V	Retrieves the X/Y/Z as the corresponding values in the vector.
+XWL:setEntity(S,E)		Sets the component's input of the specified name equal to the entity.
+XWL:entity(S)	E	Retrieves the component's output of the specified name.
+XWL:writeCell(N,N)	N	Writes the second argument to the memory cell specified by the first argument. Returns true if successful.
+XWL:readCell(N)	N	Returns contents of the specified memory cell.
+XWL:writeString(S,N,N)		A helper function for using the Wired Console Screen. The string will be written to the screen in white text on black background. The number arguments specify the starting position - X/Horizontal (0-29 recommended) and Y/vertical (0-17).
+XWL:writeString(S,N,N,N)		As above, with an extra argument for the text colour. This is in the form of a 3-digit RGB code. 0 is black, while 999 is white, 900 is pure red and so on.
+XWL:writeString(S,N,N,N,N)		As above, with an extra argument for background colour. 3-digit RGB again.
+XWL:writeString(S,N,N,N,N,N)		As above, with an extra argument for flashing text. 0 or 1 is recommended.
+
+Complex
+Developed by: Fizyk
+
+Description
+Complex numbers are an extension of real numbers to include roots of negative numbers as well.
+
+Related Examples
+Commands
+Function	Returns	Description
+comp()	C	Returns complex zero
+comp(N)	C	Converts a real number to complex (returns complex number with real part N and imaginary part 0)
+comp(N,N2)	C	Returns N+N2*i
+i()	C	Returns the imaginary unit i
+i(N)	C	Returns <n>*i
+abs(C)	C	Returns the absolute value of C
+arg(C)	C	Returns the argument of C
+conj(C)	C	Returns the conjugate of C
+real(C)	N	Returns the real part of C
+imag(C)	N	Returns the imaginary part of C
+exp(C)	C	Raises Euler's constant e to the power of C
+log(C)	C	Calculates the natural logarithm of C
+log(C,C2)	C	Calculates the logarithm of C2 to a complex base C
+log(N,C)	C	Calculates the logarithm of C to a real base N
+log2(C)	C	Calculates the logarithm of C to base 2
+log10(C)	C	Calculates the logarithm of C to base 10
+sqrt(C)	C	Calculates the square root of C
+csqrt(N)	C	Calculates the complex square root of the real number N
+C:pow(C2)	C	Raises C to the power C2
+sin(C)	C	Calculates the sine of C
+cos(C)	C	Calculates the cosine of C
+sinh(C)	C	Calculates the hyperbolic sine of C
+cosh(C)	C	Calculates the hyperbolic cosine of C
+toString(C)	S	Formats C as a string.
+Quaternion
+Developed by: Fizyk
+
+Description
+Quaternions are an extension of complex numbers. Instead of a+bi, they are of form a+bi+cj+dk, where a, b, c, d are real numbers, and i, j, k are imaginary units. The imaginary units can be used as a basis in a 3D space, allowing quaternions to represent rotations.
+Like on real and complex numbers, on quaternions you can perform addition, subtraction, multiplication and division. Operations that take a quaternion and a real/complex number are also supported (N+Q, Q*C, etc.). Beware: quaternion multiplication isn't commutative!
+Note: Because multiplication isn't commutative with quaternions, there are two ways of dividing them. Q1/Q2 is the same as Q1*inv(Q2), the second way is inv(Q2)*Q1.
+The extension also supports multiplying quaternions by vectors for the purpose of rotations. If you want to rotate vector V using quaternion Q, use this code:
+V2 = vec(Q*V*inv(Q))
+
+A short guide on quaternions can be found here: [1]
+
+Commands
+Function	Returns	Description
+quat()	Q	Creates a zero quaternion
+quat(N)	Q	Creates a quaternion with real part equal to N
+quat(C)	Q	Creates a quaternion with real and "i" parts equal to C
+quat(V)	Q	Converts a vector to a quaternion (returns V.x*i + V.y*j + V.z*k)
+quat(N,N2,N3,N4)	Q	Returns N+N2i+N3j+N4k
+quat(A)	Q	Converts A to a quaternion
+quat(V,V2)	Q	Creates a quaternion given forward (V) and up (V2) vectors
+quat(E)	Q	Converts angle of E to a quaternion
+qi()	Q	Returns quaternion i
+qi(N)	Q	Returns quaternion N*i
+qj()	Q	Returns j
+qj(N)	Q	Returns N*j
+qk()	Q	Returns k
+qk(N)	Q	Returns N*k
+abs(Q)	N	Returns absolute value of Q
+conj(Q)	Q	Returns the conjugate of Q
+inv(Q)	Q	Returns the inverse of Q
+Q:real()	N	Returns the real component of the quaternion
+Q:i()	N	Returns the i component of the quaternion
+Q:j()	N	Returns the j component of the quaternion
+Q:k()	N	Returns the k component of the quaternion
+exp(Q)	Q	Raises Euler's constant e to the power Q
+log(Q)	Q	Calculates natural logarithm of Q
+qMod(Q)	Q	Changes quaternion Q so that the represented rotation is by an angle between 0 and 180 degrees (by coder0xff)
+slerp(Q,Q2,N)	Q	Performs spherical linear interpolation between Q and Q2. Returns Q for N=0, Q2 for N=1
+Q:forward()	V	Returns vector pointing forward for Q
+Q:right()	V	Returns vector pointing right for Q
+Q:up()	V	Returns vector pointing up for Q
+qRotation(V,N)	Q	Returns quaternion for rotation about axis V by angle N
+qRotation(V)	Q	Construct a quaternion from the rotation vector V. Vector direction is axis of rotation, magnitude is angle in degress (by coder0xff)
+rotationAngle(Q)	N	Returns the angle of rotation in degrees (by coder0xff)
+rotationAxis(Q)	V	Returns the axis of rotation (by coder0xff)
+rotationVector(Q)	V	Returns the rotation vector - rotation axis where magnitude is the angle of rotation in degress (by coder0xff)
+vec(Q)	V	Converts Q to a vector by dropping the real component
+matrix(Q)	M	Converts Q to a transformation matrix
+Q:toAngle()	A	Returns angle represented by Q
+toString(Q)	S	Formats Q as a string.
+Базовые команды
+Core
+Описание
+...
+
+Команды
+Команда	Тип возврата	Описание
+first()	N	Выдает 1 если Е2 был установлен или перезапущен
+duped()	N	Выдает 1 если Е2 был скопирован
+inputClk()	N	Returns 1 if the expression was triggered by an input
+reset()		Reset the expression itself as if it was just spawned, stops execution
+exit()		Останавливает работу чипа
+Self-Aware
+Описание
+With entity() you can use Entity-Support to get all the data from the expression-entity. With concmd() you can execute console Команды. hint() allows you to display strings quickly on your screen.
+
+Also, the chip has the ability to thrust itself. Beware of the interval you're choosing for your contraption, because of the time response. (The thrust lasts for 10ms)
+
+Related Examples
+Using Hints
+Beacon Sensor by Hitman271
+GPS by Fishface60
+Speedometer by integer
+Gyroscope by GabbaGubbel
+Команды
+Function	Returns	Описание
+entity()	E	Получает entity чипа
+concmd(S)	N	Takes a string and executes it in console. Returns 1 if it succeeded and 0 if it failed.
+The client must enable this in the console with "wire_expression2_concmd 1".
+hint(S,N)		Отображает подсказку S на N секунд (N being clamped between 0.7 and 7)
+print(S)		Отображает S в чате
+printTable(T)		Prints a table like the lua function PrintTable does, except to the chat area.
+printTable(R)		Prints an array like the lua function PrintTable does, except to the chat area.
+applyForce(V)		Applies force according to the vector given (Forces independently on each axis unlike a vector thruster)
+applyOffsetForce(V,V)		Applies force to the expression according to the first vector from the location of the second
+selfDestruct()		Уничтожает чип
+selfDestructAll()		Уничтожает чип и все с ним склеено
+changed(*)		
+Checks if the value or variable was changed. Accepts any type except table and array.
+It detects changes by checking whether it was called with a different parameter at the same point in the last execution.
+Multiple calls to changed() in the _same_ execution are independent of each other.
+
+Проверяет, было изменено значение или переменная. Принимает любой тип, кроме таблиц и массива. Он обнаруживает изменения, проверяя, был ли он вызван с в другой точке.Повторные вызовы changed() в том же исполнении являются независимыми друг от друга.
+
+Timer
+Описание
+Timer functions are a way to trigger the expression to be run at a given time. Most interesting is the interval(N) function, that lets the expression be run continuously without needing triggering from inputs.
+
+Команды
+Function	Returns	Описание
+runOnTick(N)		If set to 1, the expression will execute once every game tick
+tickClk()	N	Returns 1 if the current execution was caused by "runOnTick"
+curtime()	N	Returns the current time since server-start in seconds
+interval(N)		Causes the expression to execute every N milliseconds (minimum delay is 10 milliseconds)
+timer(S,N)		Sets a one-time timer with entered name and delay in milliseconds
+stoptimer(S)		Stops a timer, can stop interval with stoptimer("interval")
+clk()	N	Returns 1 if the current execution was caused by the interval
+clk(S)	N	Returns 1 if the current execution was caused by the inserted name
+Unit Conversion
+Описание
+All conversions are precise so it is recommended to round the result if it is going to be displayed (round()).
+
+Related Examples
+Speedometer by integer
+Команды
+Function	Returns	Описание
+toUnit(S,N)	N	Converts default garrysmod units to specified units
+fromUnit(S,N)	N	Converts specified units to default garrysmod units
+convertUnit(S,S,N)	N	Converts between two units
+Units
+Length	Описание
+mm	миллиметры
+cm	сантиметры
+dm	дециметры
+m	метры
+km	километры
+in	дюймы (default)
+ft	футы
+yd	ярды
+mi	мили
+nmi	морская миля
+Speed	Описание
+m/s	метров в секунду
+km/h	километров в час
+in/s	дюймов в секунду
+mi/h	миль в час
+mph	miles per hour (more commonly used than mi/h)
+knots	knots (correct term for nautical miles per hour)
+mach	mach (times speed of sound)
+mm/x	millimeters per time unit
+cm/x	centimeters per time unit
+dm/x	decimeters per time unit
+m/x	meters per time unit
+km/x	kilometers per time unit
+in/x	inches per time unit
+ft/x	feet per time unit
+yd/x	yards per time unit
+mi/x	miles per time unit
+nmi/x	nautical miles per time unit
+substitute x for s (per second), m (per minute) or h (per hour)
+Weight	Описание
+g	грамм
+kg	килограмм
+t	тон
+oz	ounces
+lb	pounds
+Информация
+Developed by: Beer
+
+Описание
+The following functions allow you to get various information about the server, such as the current map name, gamemode, etc.
+
+Команды
+Функции	Возвращает	Описание
+map()	S	Возвращает текущее название карты
+hostname()	S	Возвращает название сервера
+isLan()	N	Returns 1 if lan mode is enabled
+gamemode()	S	Возвращает название текущего gamemode
+gravity()	N	Возвращает гравитацию
+ping()	N	Returns the latency (Player:ping() для индивидуального игрока)
+isSinglePlayer()	N	Возвращает 1,если в одиночной игре, а 0, если в сетевой игре
+isDedicated()	N	Returns 1 if server is dedicated, 0 if listen
+numPlayers()	N	Возвращает текущее число игроков на сервере
+maxPlayers()	N	Возвращает максимальное число игроков на сервере
+maxOfType(S)	N	Returns the maximum allowed of a certain type of entity, i.e. maxOfType("wire_thrusters"). Returns 0 if you enter an invalid parameter.
+playerDamage()	N	Возвращает 1, если ПВП урон включен на этом сервере
+convar(S)	S	Give a console command such as "name" and it returns the set value
+convarnum(S)	N	Give a console command such as "sbox_godmode" and it returns the set value
+time(S)	N	Returns numerical time/date info from the server. Possible arguments: "year", "month", "day", "hour", "min", "sec", "wday" (weekday, Sunday is 1), "yday" (day of the year), and "isdst" (daylight saving flag 0/1)
+TIP: To get a list of all possible parameters for maxOfType(), open the console and type "find sbox_max". If you need "sbox_maxragdolls", you can simply pass "ragdolls" in the function.
+Constraint
+Developed by: ZeikJT
+
+Описание
+The following functions get information about entities based on constraints
+
+Команды
+Function	Returns	Описание
+E:getConstraints()	R	Returns an array with all entities constrained to E.
+E:hasConstraints()	N	Returns the number of the constraints E has
+E:hasConstraints(S)	N	Returns the number of the constraints E has with the given constraint type (see the types list below)
+E:isConstrained()	N	Returns 1 if E has constraints, 0 if not
+E:isWeldedTo()	E	Returns the first entity E was welded to
+E:isWeldedTo(N)	E	Возвращает Nth entity E was welded to
+E:isConstrainedTo()	E	Returns the first entity E was constrained to
+E:isConstrainedTo(N)	E	Returns the Nth entity E was constrained to
+E:isConstrainedTo(S)	E	Returns the first entity E was constrained to with the given constraint type (see the types list below)
+E:isConstrainedTo(S, N)	E	Returns the Nth entity E was constrained to with the given constraint type (see the types list below)
+E:parent()	E	Returns the entity E is parented to.
+E:parentBone()	B	Returns the bone E is parented to.
+
+Constraint Types
+AdvBallsocket
+Axis
+Ballsocket
+Elastic
+Hydraulic
+Keepupright
+Motor
+Muscle
+NoCollide
+Pulley
+Rope
+Slider
+Weld
+Winch
+Chat
+Developed by: ZeikJT & Gwahir
+
+Описание
+The following functions are for reading the chat log. This is similar to the text receiver.
+
+Related Examples
+Chat Example by Matte
+Команды
+Function	Returns	Описание
+runOnChat(N)		1 will cause the chip to run on chat events, 0 stops the chip from running on chat events, only needs to be called once (not every execution)
+chatClk()	N	Returns 1 if the chip is being executed because of a chat event, 0 otherwise.
+chatClk(E)	N	Returns 1 if the chip is being executed because of a chat event by the given player, 0 otherwise.
+hideChat(N)		If N != 0, hide the chat message that is currently being processed.
+lastSaid()	S	Returns what the last message was in the chat log
+lastSaidWhen()	N	Returns the time the last message was said
+E:lastSaid()	S	Returns what the given player last said
+E:lastSaidWhen()	N	Returns when the given player last said something
+lastSpoke()	E	Returns the entity of the last player to speak
+Color
+Developed by: Jimlad
+
+Описание
+These Команды allow E2 to find the color of an entity and change it. Changing color only works on entities you own.
+
+Uses RGBA (Red, Green, Blue, Alpha) values, although when only RGB is specified, alpha will not be changed.
+
+Note that color values have a range of 0 - 255, where (0,0,0,255) is black, and (255,255,255,255) is white.
+
+Alpha is equivalent to opacity, where 0 is completely transparent and 255 is completely opaque.
+
+Команды
+Function	Returns	Описание
+E:getColor()	V	Returns the color of an entity as a vector (R,G,B)
+E:getColor4()	V4	Returns the color of an entity as a 4D vector (R,G,B,A)
+E:getAlpha()	N	Returns the alpha of an entity
+E:getMaterial()	S	Returns the material of an entity
+E:setColor(N,N,N)		Changes the RGB color of an entity (leaves alpha alone)
+E:setColor(N,N,N,N)		Changes the RGBA color of an entity
+E:setColor(V)		Changes the RGB color of an entity (leaves alpha alone), using a vector with values (R,G,B)
+E:setColor(V,N)		Changes the RGBA color of an entity, using a vector with values (R,G,B). The additional argument sets alpha
+E:setColor(V4)		Changes the RGBA color of an entity, using a 4D vector with values (R,G,B,A)
+E:setAlpha(N)		Changes the alpha of an entity
+E:setMaterial(S)		Sets the material of an entity. E:setMaterial("") to reset material
+|}
+
+Advanced extensions
+Entity Discovery
+Developed by: Gwahir, TomyLobo
+
+Description
+Use these to find and filter entities. The basic find functions will return how many entities were found but the actual entities are stored on the chip until they are accessed using find(), findResult(N), or findClosest(V)
+
+There is a white list and a black list as well as functions for on the spot filtering and sorting White and black lists are always in effect and will be used automatically when you request a new list of entities. Control of the lists is achieved through the find[Exclude, Allow, Include, Disallow][Player, Prop, Model, Class] functions Exclude/Allow add/remove items from the black list while Include/Disallow do the same for the white list If the same object is covered by both the white list and the black list, the black list takes priority
+
+In the case of names, classes and models, partial strings are acceptable.
+
+Discovering entities is not cheap so suggested usage is to find what you're looking for an hold onto it in order to limit the number of queries you run. To prevent overuse of these features, two console variables have been included, wire_exp2_entFindRate and wire_exp2_playerFindRate. These are delays that control how often you can perform find queries, the ent variable is per chip, the player variable is for all chip owned by a specific player
+
+Related Examples
+Thermometer Example by Entoros
+Commands
+Function	Returns	Description
+findUpdateRate()	N	Returns the minimum delay between entity find events on a chip
+findPlayerUpdateRate()	N	Returns the minimum delay between entity find events per player
+findCanQuery()	N	Returns 1 if find functions can be used, 0 otherwise.
+findInSphere(V,N)	N	Finds entities in a sphere around V with a radius of N, returns the number found after filtering
+findInCone(V,V,N,A)	N	Like findInSphere but with a cone, arguments are for position, direction, length, and degrees (currently bugged, because the underlying function is bugged)
+findInBox(V,V)	N	Like findInSphere but with a globally aligned box, the arguments are the diagonal corners of the box
+findByName(S)	N	Find all entities with the given name
+findByModel(S)	N	Find all entities with the given model
+findByClass(S)	N	Find all entities with the given class
+findPlayerByName(S)	E	Returns the player with the given name, this is an exception to the rule
+findExcludeEntities(R)		Exclude all entities from R from future finds
+findExcludeEntity(E)		Exclude E from future finds
+findExcludePlayer(E)		Exclude this player from future finds (put it on the entity blacklist)
+findExcludePlayer(S)		Exclude this player from future finds (put it on the entity blacklist)
+findExcludePlayerProps(E)		Exclude entities owned by this player from future finds
+findExcludePlayerProps(S)		Exclude entities owned by this player from future finds
+findExcludeModel(S)		Exclude entities with this model (or partial model name) from future finds
+findExcludeClass(S)		Exclude entities with this class (or partial class name) from future finds
+findAllowEntities(R)		Remove all entities from R from the blacklist
+findAllowEntity(E)		Remove E from the blacklist
+findAllowPlayer(E)		Remove this player from the entity blacklist
+findAllowPlayer(S)		Remove this player from the entity blacklist
+findAllowPlayerProps(E)		Remove entities owned by this player from the blacklist
+findAllowPlayerProps(S)		Remove entities owned by this player from the blacklist
+findAllowModel(S)		Remove entities with this model (or partial model name) from the blacklist
+findAllowClass(S)		Remove entities with this class (or partial class name) from the blacklist
+findIncludeEntities(R)		Include all entities from R in future finds, and remove others not in the whitelist
+findIncludeEntity(E)		Include E in future finds, and remove others not in the whitelist
+findIncludePlayer(E)		Include this player in future finds, and remove other entities not in the entity whitelist
+findIncludePlayer(S)		Include this player in future finds, and remove other entities not in the entity whitelist
+findIncludePlayerProps(E)		Include entities owned by this player from future finds, and remove others not in the whitelist
+findIncludePlayerProps(S)		Include entities owned by this player from future finds, and remove others not in the whitelist
+findIncludeModel(S)		Include entities with this model (or partial model name) in future finds, and remove others not in the whitelist
+findIncludeClass(S)		Include entities with this class (or partial class name) in future finds, and remove others not in the whitelist
+findDisallowEntities(R)		Remove all entities from R from the whitelist
+findDisallowEntity(E)		Remove E from the whitelist
+findDisallowPlayer(E)		Remove this player from the entity whitelist
+findDisallowPlayer(S)		Remove this player from the entity whitelist
+findDisallowPlayerProps(E)		Remove entities owned by this player from the whitelist
+findDisallowPlayerProps(S)		Remove entities owned by this player from the whitelist
+findDisallowModel(S)		Remove entities with this model (or partial model name) from the whitelist
+findDisallowClass(S)		Remove entities with this class (or partial class name) from the whitelist
+findClearBlackList()		Clear all entries from the entire blacklist
+findClearBlackEntityList()		Clear all entries from the entity blacklist
+findClearBlackPlayerPropList()		Clear all entries from the prop owner blacklist
+findClearBlackModelList()		Clear all entries from the model blacklist
+findClearBlackClassList()		Clear all entries from the class blacklist
+findClearWhiteList()		Clear all entries from the entire whitelist
+findClearWhiteEntityList()		Clear all entries from the player whitelist
+findClearWhitePlayerPropList()		Clear all entries from the prop owner whitelist
+findClearWhiteModelList()		Clear all entries from the model whitelist
+findClearWhiteClassList()		Clear all entries from the class whitelist
+findResult(N)	E	Returns the indexed entity from the previous find event (valid parameters are 1 to the number of entities found)
+findClosest(V)	E	Returns the closest entity to the given point from the previous find event
+findToArray()	R	Formats the query as an array, R:entity(Index) to get a entity, R:string to get a description including the name and entity id.
+find()	E	Equivalent to findResult(1)
+findSortByDistance(V)	N	Sorts the entities from the last find event, index 1 is the closest to point V, returns the number of entities in the list
+findClipToClass(S)	N	Filters the list of entities by removing all entities that are NOT of this class
+findClipFromClass(S)	N	Filters the list of entities by removing all entities that are of this class
+findClipToModel(S)	N	Filters the list of entities by removing all entities that do NOT have this model
+findClipFromModel(S)	N	Filters the list of entities by removing all entities that do have this model
+findClipToName(S)	N	Filters the list of entities by removing all entities that do NOT have this name
+findClipFromName(S)	N	Filters the list of entities by removing all entities that do have this name
+findClipToSphere(V,N)	N	Filters the list of entities by removing all entities NOT within the specified sphere (center, radius)
+findClipFromSphere(V,N)	N	Filters the list of entities by removing all entities within the specified sphere (center, radius)
+findClipToRegion(V,V2)	N	Filters the list of entities by removing all entities NOT on the positive side of the defined plane. (Plane origin, vector perpendicular to the plane) You can define any convex hull using this.
+Global Variables
+Developed by: ZeikJT
+
+Description
+Global variables are a way to exchange data between two expression chips without the need for any wiring at all.
+
+The global variables will be sorted into groups so that you can avoid two chips overwriting each other's global data. By default a newly spawned chip will default to "default" as the group entry, but you can always change that by using the gSetGroup(s) function.
+
+Remember, all global variables persist until you delete them or you leave the server. They will never automatically reset.
+
+Using tables like this does isn't exactly a memory free deal, when using this on servers try to keep the amount of stored global variable at any one time down to a minimum.
+
+As of right now the global group will be reset after every run. Also, try to keep the group setting down to a minimum as it can be costly.
+
+Related Examples
+Writing/Reading Global Variables by ZeikJT
+Commands
+Function	Returns	Description
+gSetStr(S)		Stores a string into the current group, use with gGetStr(S)
+gSetStr(S,S)		Stores the second string into the current group under the index specified by the first string
+gSetStr(N,S)		Stores the string into the current group under the index specified by the number
+gSetNum(N)		Stores a number into the current group, use with gGetNum(N)
+gSetNum(S,N)		Stores the number into the current group under the index specified by the string
+gSetNum(N,N)		Stores the second number into the current group under the index specified by the first number
+gGetStr()	S	Returns the string under the current group stored only by gSetStr(S)
+gGetStr(S)	S	Returns the string under the current group stored in the input string index, use with gSetStr(S,S)
+gGetStr(N)	S	Returns the string under the current group stored in the input number index, use with gSetStr(N,S)
+gGetNum()	N	Returns the number under the current group stored only by gSetNum(N)
+gGetNum(S)	N	Returns the number under the current group stored in the input string index, use with gSetNum(S,N)
+gGetNum(N)	N	Returns the number under the current group stored in the input number index, use with gSetNum(N,N)
+gDeleteStr()	S	Like gGetStr() but deletes the value after retrieval
+gDeleteStr(S)	S	Like gGetStr(S) but deletes the value after retrieval
+gDeleteStr(N)	S	Like gGetStr(N) but deletes the value after retrieval
+gDeleteNum()	N	Like gGetNum() but deletes the value after retrieval
+gDeleteNum(S)	N	Like gGetNum(S) but deletes the value after retrieval
+gDeleteNum(N)	N	Like gGetNum(N) but deletes the value after retrieval
+gSetGroup(S)		Sets the group that all global write, read, and delete functions will use, default is "default"
+gGetGroup()	S	Returns the name of the current group for the chip
+gShare(N)		Determines whether or not the group you're in is available only to you or to all players. Defaults to 0. Any value but 0 will set your group to be accessible to all players. Be mindful that there are two groups with every name, one is shared, one is not; values do not transition between the two.
+gResetGroup()		Returns the current chip's group back to "default"
+gDeleteAllStr()		Deletes all of the global strings stored under the current group, including the one stored by gSetStr(S)
+gDeleteAllNum()		Deletes all of the global numbers stored under the current group, including the one stored by gSetNum(N)
+gDeleteAll()		Deletes all of the global values stored under the current group, including the ones stored by gSetStr(S) and gSetNum(N)
+Built-In Ranger
+Developed by: ZeikJT
+
+Description
+The built-in ranger is heavily based on Erkle's original ranger. There are however some new functionalities that can be found in the commands below. Keep in mind that if you want to apply an option you must set it pre-ranging.
+
+This also introduces a new Variable type, the RD (defined as :ranger). It holds the data returned after a trace, you will need to use the trace data functions to retrieve useful data. These are to be used after you have done an actual trace.
+
+I will add a simple example to showcase the syntax and functionality.
+
+Related Examples
+Using Built-In Ranger by ZeikJT
+Radar by Coder0xff
+Commands
+Function	Returns	Description
+Ranger Options		To be used before an actual ranger trace
+rangerHitWater(N)		Default is 0, if any other value is given it will hit water
+rangerIgnoreWorld(N)		Default is 0, if any other value is given it will ignore world
+rangerDefaultZero(N)		If given any value other than 0 it will default the distance data to zero when nothing is hit
+rangerFilter(E)		Feed entities you don't want the trace to hit
+rangerFilter(R)		Feed an array of entities you don't want the trace to hit
+Ranger Tracing		Gathers data, if options are declared prior to this they will be used
+ranger(N)	RD	You input max range, it returns ranger data
+ranger(N,N,N)	RD	Same as above with added inputs for X and Y skew
+rangerAngle(N,N,N)	RD	You input the distance, x-angle and y-angle (both in degrees) it returns ranger data
+rangerOffset(V,V)	RD	You input two vector points, it returns ranger data
+rangerOffset(N,V,V)	RD	You input the range, a position vector, and a direction vector and it returns ranger data
+Ranger Data Retreval		Accesses data stored in an RD container
+RD:distance()	N	Outputs the distance from the rangerdata input, else depends on rangerDefault
+RD:position()	V	Outputs the position of the input ranger data trace IF it hit anything, else returns (0,0,0)
+RD:entity()	E	Returns the entity of the input ranger data trace IF it hit an entity, else returns nil
+RD:hit()	N	Returns 1 if the input ranger data hit anything and 0 if it didn't
+RD:hitNormal()	V	Outputs a normalized vector perpendicular to the surface the ranger is pointed at.
+Проигрывание звуков
+Developed by: ZeikJT
+
+Translated by: Vlad Schmidt from NxRP
+
+Описание
+Позволяет Expression 2 проигрывать звуки. Вы можете найти список с Half-life 2 звуками тут (here) или использовать GCFScape для прослушивания каждого звука.
+
+Длительность указывается в секундах. Если звук должен быть зациклен, ставьте длительность на 0. Путь к файлу должен содержать слэши '/' и ни одного обратного слэша '\'.
+
+Команды
+Команда	Возвращает	Описание
+soundPlay(N,N,S)		soundPlay(int Index, int Duration, string Path to File)
+Проигрывает звук где:
+
+Index - индекс(число);
+Duration - длительность;
+Path to File - месторасположение звука;
+soundPlay(S,N,S)		soundPlay(string Index, int Duration, string Path to File)
+Проигрывает звук где:
+
+Index - индекс(строка);
+Duration - длительность;
+Path to File - месторасположение звука;
+soundPlay(N,N,S,N)		soundPlay(int Index, int Duration, string Path to File, int FadeTime)
+FadeTime - указывает время "затухания" звука
+
+soundPlay(S,N,S,N)		soundPlay(string Index, int Duration, string Path to File, int FadeTime)
+FadeTime - указывает время "затухания" звука
+
+soundStop(N)		Останавливает все звуки по индексу(int)
+soundStop(N,N)		Звук "затухает" (постепенно снижает громкость и выключается) в течении указанного времени. Принимает индекс в виде числа
+soundStop(S)		Останавливает все звуки по индексу(string)
+soundStop(S,N)		Звук "затухает" (постепенно снижает громкость и выключается) в течении указанного времени. Принимает индекс в виде строки
+soundPitch(N,N)		soundPitch(integer Index, integer Pitch) (стандартный Pitch 100)
+Изменяет звуковое поле.
+
+soundPitch(S,N)		То же самое только берёт индекс в виде строки
+soundVolume(N,N)		soundVolume(integer Index, integer Volume) (стандартное значение 1)
+Устанавливает громкость где:
+
+integer Index - индекс(число)
+integer Volume - громкость(число)
+soundVolume(S,N)		То же самое только берёт индекс в виде строки
+soundPurge()		Очищает и останавливает все звуки
+NPC control
+Developed by: Bobsymalone
+
+Description
+These functions allow you to control NPCs. You can create secondary AI systems responding to wire by telling NPCs how to feel about certain things, where to go, etc. You can also equip them with weapons.
+
+Related Examples
+Wire_Expression2:Examples#NPC_pet_by_Bobsymalone
+
+Commands
+Function	Returns	Description
+E:npcStop()		Прекращает любое действие НПС
+E:npcGoWalk(V)		Командует НПС идти на позицию V
+E:npcGoRun(V)		Командует НПС бежать на позицию V
+E:npcFace(V)		This will rotate the NPC to face position V. This is purely aesthetic and can't be used to aim their weapon.
+E:npcAttack()		Командует НПС бить
+E:npcShoot()		Командует НПС стрелять
+E:npcGiveWeapon()		Выдает НПС пулемет (SMG)
+E:npcGiveWeapon(S)		Выдает НПС оружие. Например: E:npcGiveWeapon("pistol"). Другие варианты оружия: "ar2", "crowbar", "357", "shotgun", "crossbow", "rpg", "frag", etc.
+E:npcRelationship(E,S,N)		Will set the NPC's relationship to the specified entity to the S input, priority N. Priority is any number between 0 and 999. The relationship string can be either "like" "neutral" "hate" or "fear". Same goes for all other relationship functions.
+E:npcRelationship(S,S,N)		Same as above, but sets relationship to an entire class specified by the first string. Example: "npc_manhack", "prop_physics".
+E:npcRelationshipByOwner(E,S,N)	N	Sets the NPC's relationship to all currently existing NPCs owned by player E. Returns number of entities added to relationships.
+E:npcDisp(E)	S	Returns the NPC's relationship to entity E.
+Сигналы
+Разработал: Gwahir и TomyLobo
+
+Описание
+Эти функции позволяют удаленно выполнять exp2 чипы , при условии, что чип настроен на получение данного сигнала
+
+
+Область видимости
+Сигналы ограничены определенными областями (0 - только вы, 1 - все, 2 - все кроме вас)
+
+Упрощенно, true = все, false = только вы.
+
+Области видимости применяются для указания тех, кто может получить ваш сигнал и чей сигнал вы можете получить.
+
+Область видимости всегда применяется по отношению к владельцу. Так что если игрок A посылает в область видимости 1 и игрок B получает только из области видимости 0, он/она не получит сигнал, но игрок B получит сигнал из областей видимости 1 или 2
+
+
+Группа
+Установите группу чипа используя signalSetGroup(S) перед вызовом функций runOnSignal, sendSignal, или signalSetOnRemove
+
+Изначально группа сигнала чипа имеет значение "default".
+
+runOnSignal() будет относится к сигналу в пределах заданной группы, это также относится к посылаемому сигналу
+
+Любой сигнал получаемый чипом будет запускать чип независимо от текущий группы (до тех пор пока он относится сигналу и группе посылаемомого сигнала)
+
+
+Чип никогда не будет работать, если он посылает сигнал сам себе.
+
+Signals are issued 10ms after the first unissued signal was sent.
+There can only ever be one unissued signal/group combination per receiver in each scope.
+
+Пример работы
+Команды
+Функция	Возвращает	Описание
+signalSetGroup(S)		Устанавливает текущую группу сигнала E-2 к S, используется во время вызова runOnSignal, signalSend, и signalSetOnRemove
+signalGetGroup()	S	Возвращает текущую группу сигнала E-2
+runOnSignal(S,N,N2)		If N2 == 0 the chip will no longer run on this signal, otherwise it makes this chip execute when signal S is sent by someone in scope N.
+signalClk()	N	Returns 1 if the chip was executed because of any signal, regardless of name, group or scope. Returns 0 otherwise.
+signalClk(S)	N	Returns 1 if the chip was executed because the signal S was sent, regardless of group or scope. Returns 0 otherwise.
+signalClk(S,N)	N	Returns 1 if the chip was executed because the signal S was sent to the scope N, regardless of group. Returns 0 otherwise.
+signalClk(S,S2)	N	Returns 1 if the chip was executed because the signal S2 was sent in the group S, regardless of scope N . Returns 0 otherwise.
+signalClk(S,S2,N)	N	Returns 1 if the chip was executed because the signal S2 was sent in the group S to the scope N. Returns 0 otherwise.
+signalName()	S	Возвращает имя принимаемого сигнала
+signalGroup()	S	Возвращает имя группы принимаемого сигнала
+signalSender()	E	Возвращает entity чипа который отправил сигнал
+signalSenderId()	N	Возвращает entity ID чипа который передал сигнал. Полезно, если entity больше не существует
+signalSetOnRemove(S,N)		Устанавливает сигнал посылаемый чипом, когда он удаляется
+signalClearOnRemove()		Убирает сигнал посылаемый чипом, когда он удаляется
+signalSend(S,N)		Посылает сигнал S в область видимости N. Дополнительные вызовы этой функции с тем же сигналом будут перезаписывать старый вызов пока сигнал выдается
+signalSendDirect(S,E)		Посылает сигнал S на указанный чип. Множественные вызовы для разных игроков не перекрывают друг друга
+signalSendToPlayer(S,E)		Посылает сигнал S к чипам , принадлежащим данному игроку. Множественные вызовы для разных игроков не перекрывают друг друга
+
+GLON
+Разработал: TomyLobo
+
+Описание
+Это расширение позволяет превратить строку в строку массив или таблицу значений. Неподдерживаемые типы элементов
+
+Кости
+Некоторые типы entity (Vehicle, NPC, Weapon)
+данные рейнджера (ranger) если рейнджер был направлен на один из типов entity, упомянутых ранее .
+Пример работы
+Команды
+Функция	Возвращает	Описание
+glonEncode(R)	S	Декодирует R в строку, используя GLON
+glonEncode(T)	S	Декодирует T в строку, используя
+GLON
+
+glonDecode(S)	R	Декодирует S в массив, используя GLON
+glonDecodeTable(S)	T	Декодирует S в таблицу, используя GLON
+3D Голограммы
+Разработал: IamMcLovin и ZeikJT
+
+Описание
+Добавляет возможность проецирования 3D объектов. С этими объектами нельзя взаимодействовать как с большинством других пропов; единственный способ управлять ими - использовать эти функции.
+
+При использовании функции holoCreate, имейте в виду, что существует задержка, связанная с созданием голограмм чтобы избежать зависания сервера. Избегайте многократного использования holoCreate. Вы должны использовать функцию HoloCreate только один раз для каждой голограммы в коде, например, используя функцию first(). Используйте остальные функции, например holoPos, чтобы обновлять их в дальнейшем.
+
+Заметьте, что кроме wire_holograms_display_owners, все другие консольные команды могут использовать только администраторы!
+
+Консольные команды
+Функция	Возвращает	Описание
+wire_holograms_display_owners		Показывает лист владельцов галограмм
+wire_holograms_remove_all		Удаляет все голограммы на карте
+wire_holograms_block		Введите имя (или часть имени), чтобы запретить игроку создавать голограммы
+wire_holograms_unblock		Введите имя (или часть имени), чтобы снова позволить игроку создавать голограммы
+wire_holograms_block_id		Введите Steam ID, чтобы запретить игроку создавать голограммы
+wire_holograms_unblock_id		Введите Steam ID, чтобы снова позволить игроку создавать голограммы
+wire_holograms_max		Определяет максимальное количество голограмм которое которое может иметь игрок
+wire_holograms_size_max		Определяет максимальный размер голограмм в соответствии с функцией holoScale
+Пример работы
+Команды
+Функция	Возвращает	Описание
+holoCreate(N,V,V,A,V)		Index, Position, Scale, Angle, Color (RGB)
+Создать голограмму
+holoCreate(N,V,V,A)		Index, Position, Scale, Angle
+Создать голограмму
+holoCreate(N,V,V)		Index, Position, Scale
+Создать голограмму
+holoCreate(N,V)		Index, Position
+Создать голограмму
+holoCreate(N)		Index
+Создать голограмму
+holoDelete(N)		Index
+Удаляет голограмму с указанным индексом
+holoScale(N,V)		Index, Scale
+Размер голограммы
+holoScaleUnits(N,V)		Index, Scale
+Scales a hologram in each direction according to Garry's Mod units, given by a vector
+holoPos(N,V)		Index, Position
+Установить позицию голограммы
+holoColor(N,V,N)		Index, Color, Alpha
+Изменить цвет голограммы
+holoColor(N,V)		Index, Color
+Изменить цвет голограммы
+holoAlpha(N,N)		Index, Alpha
+Меняет параметр Alpha голограммы
+holoShadow(N,N)		Index, Shadow
+Установив это значение в 0 у голограммы отключаються все тени, установка значения в 1 приведёт к их отображению
+holoAng(N,A)		Index, Angle
+Установить позицию вращения голограммы
+holoModel(N,S,N)		Index, Model, Skin
+Установить модель на голограмму
+holoModel(N,S)		Index, Model
+Установить модель на голограмму
+holoSkin(N,N)		Index, Skin
+Смена скина голограммы
+holoMaterial(N,S)		Index, Material
+Смена материала голограммы
+holoRenderFX(N,N)		Index, Render FX #
+Изменяет эффект отображения для голограммы
+holoParent(N,N)		Index (current Holo), Index (Holo being parented to)
+Прикрепляет одну голограмму к другой
+holoParent(N,E)		Index, Entity
+Закрепить голограмму за ентитей
+holoUnparent(N)		Index
+Убирает любые родительские свойства с голограммы
+Список моделей
+["cone"]
+["cube"]
+["cylinder"]
+["icosphere"]
+["icosphere2"]
+["icosphere3"]
+["prism"]
+["pyramid"]
+["sphere"]
+["sphere2"]
+["sphere3"]
+["torus"]
+["torus2"]
+["torus3"]
+
+а поебаться тебе не завернуть?
+а сто хуёв — большая куча?
+апчхуй
+архипиздрит
+ахуй
+ахулиард
+беден как Адам, и хуя прикрыть нечем
+без пизды
+бля
+блядво
+блядёшка
+блядина
+блядища
+блядки
+блядовать
+блядовитый
+блядоёбина
+блядский
+блядство
+блядствовать
+блядун
+блядь
+блядькать
+блядькнуть
+бляха-муха
+босый хуй
+босым хуем около голой пизды шутки не шутят
+буква «ю» — по хую
+был бы хуй, а подхуйки найдутся
+в ахуе
+в два хуя
+в душе не ебу
+в еблет наклацать
+в жопу ёбаный
+в пизду
+в рай въехать на чужом хую
+в рот ебаться
+в хуй дует
+в хуй дышит
+в хуй не всраться
+в хуй не дуть
+в хуй не ставить
+в хуй не упереться
+веселоебучесть
+веселоебучий
+весь в поте и хуй в роте
+весь в поту и хуй во рту
+вешать лапшу на хуй
+взъёб
+взъебать
+взъёбка
+взъебти
+взъёбывать
+влындить хуй
+во рту мухи ебутся
+война — хуйня, главное — манёвры
+вола ебать
+волоёб
+волоёбство
+вот и весь хуй
+вот те нате — хуй в томате!
+врубить съебаторы
+всё в ажуре, а хуй на абажуре
+всё пучком и пизда торчком
+вхуяриться
+въёб
+въебать
+въебаться
+въебашить
+въебенить
+въёбка
+въёбывать
+въехать в рай на чужом хую
+выблядок
+выебанный
+выебать
+выебаться
+выебина
+выёбистый
+выебнуть
+выебнуться
+выебон
+выебонщик
+выебсти
+выебти
+выёбывать
+выёбываться
+выеть
+выпиздеться
+выпиздить
+гавкнуть пиздой
+где совесть была, там хуй вырос
+головка от хуя
+голодная пизда
+голосуй — не голосуй, всё равно получишь хуй
+голохуевка
+горит пизда
+дать в еблетку
+дать пизды
+дать по ебалу
+дать по пизде мешалкой
+дебилы, блядь
+девятый хуй без соли доедать
+дневальный! подай станок ебальный!
+до пизды
+до хуища
+до хуя
+довыёбываться
+доёб
+доебать
+доебаться
+доёбистый
+доёбка
+доебсти
+доебти
+доёбчивость
+доёбчивый
+доёбщик
+доёбывать
+доёбываться
+доигрался хуй на скрипке
+долбоёб
+долбоебизм
+долбоёбина
+долбоёбище
+долбоёбский
+долбоёбство
+допиздеться
+дохулион
+дохуя
+драпиздон
+драпиздончик
+друг дружку ебут и деньги в кружку кладут
+дуроёб
+дядеёб
+ёб
+ёб вашу мать
+ёб иху мать
+ёб твою мать
+ёб твоя мать
+ебабельность
+ебабельный
+ебак
+ебака
+Ебаков
+ебал
+ебал я тебя в грызло
+ебала
+ебала жаба гадюку
+ебалай
+ебалайствовать
+ёбалды
+ебало
+ебало завали!
+ебало на ноль!
+ебало офнуть
+ебало раскурочить
+ебало сверни!
+ебало свернуть
+ебальная
+ебальник
+ебальник начистить
+ебальник просрать
+ебальник разрисовать
+ебальничек
+ебальный
+ебальня
+ебальце
+ебан
+ебанарий
+ебанат
+ебанатик
+ебанашка
+ебание
+ебанизм
+ебанина
+ебанистика
+ебанистический
+ёбанный
+ебано
+ёбаногандонный хуепедераст
+ебаноид
+ебанутость
+ебанутый
+ебануть
+ебануть в бороду
+ебануться
+ебанушка
+ебаный
+ёбаный
+ёбаный в жопу
+ёбаный в рот
+ёбаный насос
+ёбаный покос
+ёбаный стос
+ёбаный стыд
+ёбаный шашлык
+ёбань
+ебанье
+ебанько
+
+
+
+
+0:04 / 14:15 (13:42)
+
+
+ИСТОРИЯ ЧИТОВ
+
+Restart
+424 тыс. подписчиков
+
+Вы подписаны
+Скачать
+720
+
+11 тыс.
+
+
+Поделиться
+
+Скачать
+
+Создать клип
+
+162 тыс. просмотров  4 года назад
+Играй бесплатно в Калибр - https://bit.ly/2P7uxvo
+
+По вопросам рекламы - zhironkin.ilya@gmail.com …
+562 комментария
+NAAIN
+Введите комментарий
+
+@T--wk9oe
+4 года назад (изменено)
+Вот тебе кулстори. У супонева в его "денди-новая реальность" был конкурс на лучшие секретки в играх. В одном из выпусков победил пацан, который нашел чит-код ABBA ABBA в сеговском аладдине.  Он рассказал, что однажды ему позвонил друг и ему пришлось поставить игру на паузу. Пока трепались он настукивал рандомно и ритмично кнопки на геймпаде  и таким макаром открыл меню с доступом ко всем уровням (код вводится как раз на паузе).
+
+139
+
+
+
+Ответить
+
+
+4 ответа
+
+@I_BlackWolf_I
+4 года назад
+Если настоящий спецназ и правда работает как в калибре, то я лучше в окно ливну.
+
+179
+
+
+Ответить
+
+
+5 ответов
+
+@markus_glevera
+4 года назад
+Есть крутой чит, Alt F4, работает почти во всех играх. Целиком меняет игру
+
+710
+
+
+
+Ответить
+
+
+25 ответов
+
+@sinon8626
+4 года назад
+читы хорошая тема до момента пока они не в онлайне
+
+432
+
+
+Ответить
+
+
+16 ответов
+
+@DedHobbit
+4 года назад
+читы-это интересная вещь для одиночных игр.иногда это может вдохнуть вторую жизнь в уже пройденную игру.
+p/s читы в онлайне-это зло
+
+89
+
+
+Ответить
+
+
+@user-rt9li6ib4r
+4 года назад
+Мои любимые два чита на ГТА: все люди пытаются убить друг-друга и игрока + у каждого человека рандомное оружие. Такое мясо в городе
+
+94
+
+
+Ответить
+
+
+6 ответов
+
+@barsukRND
+4 года назад
+Самый угарный чит во второй Эпохе. Не тот, который про машины. Там есть чит, который дает играть за природу. Тип рил управлять оленями, кабанами и птицами)))
+
+24
+
+
+Ответить
+
+
+@Nickkmd999
+4 года назад
+Помню в 2004 у меня даже был блокнот с читами к гта и прочим играм, который мы переписывали друг у друга.
+
+139
+
+
+Ответить
+
+
+3 ответа
+
+@user-lk5es2nv6b
+4 года назад
+Да сохранит вас iddqd и да приумножит ваше благосостояние idkfa.
+
+43
+
+
+Ответить
+
+
+@one_aprelsky
+4 года назад
+Самые угарные читы были в "Postal 2", особенно тот, что позволял стрелять котами :))
+
+8
+
+
+Ответить
+
+
+@NickFactor
+4 года назад
+Самый клевый чит был в Вайс Сити и он спавнил у Томми Версетти сигарету в зубах
+
+27
+
+
+Ответить
+
+
+2 ответа
+
+@Reffis
+4 года назад
+До сих пор пытаюсь применить Konami код к своему  кошельку,  что бы открыть новые финансовые возможности)
+
+31
+
+
+Ответить
+
+
+4 ответа
+
+@terrasdoil
+4 года назад
+Помни юный падаван, читы - зло! Но не в сингплеере.
+
+13
+
+
+Ответить
+
+
+@jackasmile6517
+4 года назад
+могла пропустить, потому что слушала фоном, но ульта у солдата 76 и вдовы в овервотч - это и есть большая отсылка к читам
+
+25
+
+
+Ответить
+
+
+3 ответа
+
+@alekshabarov4940
+4 года назад (изменено)
+Хорошее настроение
+
+Это когда выходит по ролику у командера и на Restart
+
+37
+
+
+Ответить
+
+
+8 ответов
+
+@MengShou
+4 года назад
+В симс написал Motherlod и ты уже в машине ФБР.
+
+15
+
+
+Ответить
+
+
+1 ответ
+
+@makcbill8504
+4 года назад
+Спасибо за видео. Я это давно просил и ждал!
+
+1
+
+
+Ответить
+
+
+@clodyamodya8910
+4 года назад
+"whosyourdaddy - олдскулы долой"
+
+12
+
+
+Ответить
+
+
+1 ответ
+
+@johnxina3642
+4 года назад
+Нажми прыжок во  время финальной заставки черного плаща перед тем, как он споткнется об камень и тогда он перепрыгнет его и начнется еще один уровень с анти плащом в роли финального босса. Самая знаменитая байка про игры среди людей, старше 27 лет
+
+1
+
+
+Ответить
+
+
+@mrinbmrinb9419
+4 года назад
+Сцены с "неудачными" дублями эт круто))
+
+Из-за читеров покинул несколько некогда любимых онлайн проектов. Сейчас вообще играю на плахе)
+Но вот в синглплеере это весело, гташки конечно масштабнее всего в этом запомнились))
+Трактор на нитро казался забавным. Тогда.)
+
+1
+
+
+Ответить
+
+
+@nataliya7923
+4 года назад
+В Героях-4 были коды на время боя, которые превращали героя в рокера с гитарой или в старого дедушку с ходунками. Дедушка был особо хорош, потому что дальняя атака была как от Горящей стрелы, а в ближнем бою он распадался на две половинки, и оттуда атаковало чудовище.
+
+1
+
+
+Ответить
+
+
+@user-hi2lc7sx1s
+4 года назад
+Ух ска! Как во время. Песдуешь, такой, вечером домой, а тут Бро Командер с новым видосиком ждёт.
+
+3
+
+
+Ответить
+
+
+@user-pn7ub3od9w
+4 года назад
+До сих пор помню, как мы с пацанами будучи школьниками резались в nfs 2 с читами - выбирали модельки грузовиков,  легковушек, киосков и тд... Даже на бревне гоняли!
+
+1
+
+
+Ответить
+
+
+@bobr9364
+4 года назад
+Развернуть пушку назад  и в обычном режиме можно навести шорох в городе и лететь снося все на своем пути.
+Однако лучшее сочетание это танк и взорвать все. Ты спавниш танк, залезаешь, нанимаешься в полицию, вылезаешь, взрываешь все вокруг, спавнишь танк, залезаешь, сдаешь заказ и получаешь новый и так по кругу до денежного удовлетворения.
+
+
+
+Ответить
+
+
+@jayhomacha8137
+4 года назад
+Всегда умиляло, когда какой-нибудь школопёс забегает на стрим к 35-нему мужику, который сел за комп задолго до того, как батя школьника присунул его мате, и пишет в чат про комбинацию Alt-F4 с понтом "Гы-гы, какую я оригинальную шутку придумал, щас будет весело!" ))
+
+
+
+Ответить
+
+
+@medvedkin1337
+4 года назад
+Помню, развлекались с консолью в Fallout 3. Когда меня задалбывало бегать через всю пустошь, если была такая необходимость, забивал на своего перса setscale 10 и огромный великан за секунды пробегал все скучные территории)
+
+1
+
+
+Ответить
+
+
+@himurakenshin5364
+4 года назад
+Бмарвинб в Готике. И вселяешься в любого нпс. От жука до дракона. Вот это было весело
+
+1
+
+
+Ответить
+
+
+@sergeomiller4267
+4 года назад
+4:02 
+ОооО!!! Батла за Бикини Боттом на Gameboy SP!!!
+Моё ностальгическое сердечко йокнуло!
+
+
+
+Ответить
+
+
+@FattestWarlock
+4 года назад
+Я надеюсь в видосе про Сегу сатурн будет СЕГАТА САНШИРО и его ЭПИЧНАЯ ПЕСНЯ
+
+7
+
+
+Ответить
+
+
+@Adckuu_DP04uJIA
+4 года назад
+чит на летающие машины + чит на откидывание машин при столкновении в ГТА СА. веселое мероприятие, конечно
+
+3
+
+
+Ответить
+
+
+@denisfedosov7083
+4 года назад
+Забавная тема в классическом Deus Ex была, во время игры заходишь в credits пишешь thereisnospoon, и игра включает режим Матрицы
+
+
+
+Ответить
+
+
+@user-th6is4ve4r
+4 года назад
+ЧИТ в The Stanley Parable, который отправляет тебя в комнату, где рассказчик тебя отЧИТывает.
+
+1
+
+
+Ответить
+
+
+@sobskii
+4 года назад
+Помню свой первый код на Jurassic Park. Я тогда дошёл до последнего уровня и не мог его пройти, нашёл книгу кодов, выписал код на «последний уровень» и когда ввёл его оказался там же где и застрял. Пришлось думать.
+
+2
+
+
+Ответить
+
+
+@ThisIsVenom65
+4 года назад
+В Age of Emire и в Age of Mythology в частности при вводе OCANADA спавнился ЛЕТАЮЩИЙ МЕДВЕДЬ В ПЛАЩЕ С КАНАДСКИМ ФЛАГОМ СТРЕЛЯЮЩИЙ ЛАЗЕРОМ ИЗ ГЛАЗ
+Вот такого поворота злобный титан Кронос точно не ожидал : D
+
+1
+
+
+Ответить
+
+
+@pablumemes
+4 года назад
+Помню, папа принес мне распечатку всех читов для инспектора гаджета на Геймбое. Эх... было время
+
+3
+
+
+Ответить
+
+
+@sergeik787
+4 года назад
+Когда- то в середине 90ых были игра на денди Принц Персии. Там по прохождению уровня давали код с которым ты сразу мог попасть обратно на тот уровень который прошел. Единственное если не ошибаюсь на прохождение всей игры давалось всего час если не ошибаюсь. Т.е. перейдя на второй уровень затратив 10 минут на первый у тебя оставалось 50 минут на прохождение остальной игры. И каждый раз вбивая код и проходя на второй уровень у тебя оставалось 50 минут. Игра была крайне сложная, ну и я был пиздюком 12 лет, так что игру я так и не прошел. Но один раз я не правильно вбил код перепутав две буквы которые стояли рядом и попал на несколько уровней вперёд, правда с остатком времени совсем в мизер. И тогда я понял что меняя несколько букв в коде можно прыгать по уровням, правда при этом менялось и остаток времени. Тогда первый раз себя почувствовал хакером пробуя десятки разных комбинаций что бы пройти эту ненавистную игру.
+
+1
+
+
+Ответить
+
+
+@roman_zubrilin_88
+4 года назад (изменено)
+В игре "Казаки" есть (как и в "StarCraft") чит на показ всей карты. Суть не столько в действии, сколько в его названии - WWW. Типа как часть адреса сайта.
+
+
+Забыл игру для "MS DOS", но там был чит, позволяющий скрыть игру от начальника на работе и показать псевдо консоль.
+
+
+Мой любимый чит - во времена "Sony PlayStation" пираты выпускали диск с "Tekken 3", на котором было два режима. Обычный и со всеми открытыми персонажами. Помню, что для открывания Доктора Босконовича надо было проходить "Tekkn Force", но я так его и не осилил.
+
+
+Кстати об игре "StarCraft". Когда были популярны клубы и мы с моим покойным братом играли по сети, он каким-то образом отрывал всю карту и ещё как-то читирил.
+
+
+
+Ответить
+
+
+@user-wj2sn5cb9o
+4 года назад
+То чувство,когда задолбалось жрать дошик. Да автор? Эт намёк на рекламу КЛЛибр ! Каллом-хорошую игру не назовут !
+
+4
+
+
+Ответить
+
+
+@cpt.macmillan1561
+4 года назад
+Помните бумажку с чит кодами для gta sa!???!
+
+17
+
+
+Ответить
+
+
+2 ответа
+
+@4YBAKProductions
+6 месяцев назад
+Читы в Готике 2 позволяют снимать машинимы, вот это прям база 
+
+
+
+Ответить
+
+
+@viking19777
+4 года назад
+Читы это было весело, особенно в гта, танк это было круто)))
+
+1
+
+
+Ответить
+
+
+@Alexsakharniy
+4 года назад (изменено)
+Этот момент, когда до сих пор используешь ArtMoney, а через три недели новое десятилетие...
+
+1
+
+
+Ответить
+
+
+@-nPoKa3HuK-
+4 года назад
+AC вверх B вверх BA вниз вниз Блод код на Мортал первый. До сих пор помню)))
+
+1
+
+
+Ответить
+
+
+@Sviorr
+4 года назад
+В Jedi Academi можно было читами включать крутейшие вещи:
+1) расчлененку! - наруби штормтрупера!
+2) Супер силы 4 уровня - полноценный контроль разума через отвлечение - вселись в тело ранкора и разнеси все!
+3) Новые стили владения мечом! (Как у Дессана и Тавион)
+4) Менять скин игрока - проходи игру за Бобу Фета с работающим джетпаком!
+5) всякие мелочи вроде таунтов и замедления времени по нажатию клавиши.
+
+
+
+Ответить
+
+
+@link5635
+4 года назад
+Мне кажется, самый прикольный чит был в игре Oni. Путем нехитрых манипуляций в файле игры, можно было по нажатию клавиши F1 в самой игре, менять персонажа со стандартного на любого противника. Прикольно было пройти игру за главного антагониста, например. Эххх... было время.
+
+
+
+Ответить
+
+
+@MrGoisa
+4 года назад (изменено)
+в конце заинтриговал))почувствовал себя Хатико
+
+
+
+Ответить
+
+
+@elenatixomirova33
+4 года назад
+про лару крофт. там комбинация правильная была одна. с прыжком назад. открывалось все оружие. после введения первых комбинаций до прыжка, прыжок в любую другую сторону означал смерть) разрывал лару.
+
+
+
+Ответить
+
+
+@Popug404
+4 года назад
+Когда у меня появился CheMax, я чувствовал себя видеоигровым Богом.
+
+3
+
+
+Ответить
+
+
+@user-tu1do1lz3y
+4 года назад
+ripazha, aezakmi, kjkszpj... охренеть, я их почти с два десятка из GTA помню... до сих пор.  10 почти лет прошло)
+
+
+
+Ответить
+
+
+@elke1028
+4 года назад (изменено)
+единственное читерсто, которым пользовался - это в GTA на количество звезд розыска. Такое вот соревнование было, кто дольше продержится на максимальном уровне, эдакое родео. Но последней частью, где вся это фигня закончилась - был Vice City. Без всяких бессмертий, дополнительного оружия и прочего, только звезды. Такая штука очень распространенная в клубах была еще, кстати, кто мог продержаться дольше всех - тому оплачивали дополнительное время
+
+
+
+Ответить
+
+
+@Sanchez_pi
+4 года назад
+У готики была прикольная система читов. Правда из забавного я лишь помню, что всех неписей можно было сделать огромными или наоборот маленькими
+
+
+
+Ответить
+
+
+@Dr.Stone176
+4 года назад
+Очень клёвая тема была plants vs zombie. Растишь дерево и оно выдает тебе "читы" которые меняли зомби и тд.
+
+
+
+Ответить
+
+
+@sergeysbg634
+4 года назад
+Тони Хок про скейтер 3, открывающийся лист с чит-кодами невесомости, больших голов, скрытых персонажей и уйму иных всяческих забавных  возможностей, тем самым привлекая игрока задержаться в процессе на подольше.
+
+
+
+Ответить
+
+
+@user-ur4bn5eh4v
+4 года назад
+В fallout 3 чит увеличивающий модель персонажа включаешь и идёшь бить бегемота в рукопашную, эта битва войдёт в историю
+
+
+
+Ответить
+
+
+@Vas_Vas_N7
+4 года назад
+ABC-CBA-CBA-CBAAA-CACB-CACACA-BCB
+
+
+Это код к игре Робокоп против Терминатора, на Sega. Он давал бессмертие и способность очень высоко прыгать. Вроде даже прыгать сквозь потолок на уровень выше и проходить сквозь стены. А если после ввода этого кода прыгнуть в левый верхний угол, то Робокоп телепортируется в черную комнату. Если долго идти вправо в этой комнате, то в конце  появится групповое фото команды разработчика на заднем фоне. После выхода из черной комнаты игроку добавят все виды оружия (но это не точно).
+
+
+PS Прошло больше 20-ти лет! Почему я это помню?!
+
+
+
+Ответить
+
+
+@UAkuni
+4 года назад
+Вот прохладная из детства по поводу читов: после выхода GTA Vice City в одном компьютерном клубе сделали дополнительный заработок - распечатать читы с CheMax на любую игру. Многие тогда ходили по клубам с листом читов на Vice City, но лишь единицы обращали внимание, что часть читов не оказывалась в списке (админы того клуба печатали только одну страницу и даже не парились взглянуть, что там еще может быть вторая). То, что есть в городе всего горстка избранных, у которых есть совершенно другие читы, родило легенду о совсем несусветных и безумных читах для Vice City
+
+
+
+Ответить
+
+
+@user-lc9ks4zf4e
+4 года назад
+Посмотрев твоё видео прям ностальгия какая-то взяла. Ну честно говоря я и до сих пор если сложно бывает играть, просто ввожу чит и норм. Я считаю, что читерство в одиночной игре - это дело каждого. А вот в многопользовательской, или онлайн игре - это уже мошеничество.
+
+
+
+Ответить
+
+
+@user-vr3hs5yp6o
+4 года назад
+Ого новый видос на ПЕРВОМ канале коммандера.
+Нет в натуре тут видосы чаще выходят
+
+
+
+Ответить
+
+
+@Aabbcczzxxcc
+4 года назад
+8:06 да он на нереальную реакцию стреляет, там без очков видно что очевидно палится.
+
+1
+
+
+Ответить
+
+
+@asdfasd4571
+4 года назад
+787898 - навсегда в наших сердцах.
+
+2
+
+
+Ответить
+
+
+@fan-di9ee
+4 года назад
+Мой любимый чит-код был в Jedi Knight Academy на реалистичное разрубание конечностей световым мечом
+
+
+
+Ответить
+
+
+@shampipi
+4 года назад
+на сеге в игре robocop vs terminator был код добавляющий новых персонажей в и повышающий уровень жести, крови и кишок. реально круто было
+
+
+
+Ответить
+
+
+@Etna911
+4 года назад
+я помню, кросфаер на денди, каким то макаром натыкал стрелочками и селектом код который хп восстанавливал.. потом всё как в тумане)
+
+
+
+Ответить
+
+
+@PNllAll
+4 года назад
+В Vimpires the Masqarade: Bloodline если набрать в консоли money [значение] вместо денег меняется размер груди у женского персонажа
+
+2
+
+
+Ответить
+
+
+@Amsterdamn76
+4 года назад
+Закрой крышечку флешки на рекордере! :)
+
+
+
+Ответить
+
+
+@somsokkric7732
+4 года назад
+в ремастеринге ТУРОК2 читы на головы,руки и перекрашивание всего мира до сих пор доставляют)))
+
+
+
+Ответить
+
+
+@zakturbo1
+4 года назад
+Читы это было весело, сейчас их заменили трейнеры, но сути это не меняет, так же весело как и раньше, включил годмод и играешь себе не напряжно, и в онлайне тоже можно Читы поюзать)
+
+
+
+Ответить
+
+
+@user-um1of8md2d
+4 года назад
+>как работает настоящий спецназ
+>калибр
+
+
+
+Ответить
+
+
+@Grilled_Sandwich
+4 года назад (изменено)
+A, C, вверх, В, вверх, В, А, вниз
+MK Ultimate на сеге - меню, где могут открыться боссы, фаталки и 99 "континьюсов". 
+Денис, 29 годиков
+
+1
+
+
+Ответить
+
+
+@Anthony_Daniels
+4 года назад
+Массовый хаос в GTA San Andreas. Все против всех
+
+
+
+Ответить
+
+
+@Next733
+4 года назад
+На заре Dota AllStars, в середине нулевых, рецепты на артефакты не требующие рецептов (а рецепты были нужны для того, чтобы понять из чего артефакт собирается) продавались за дерево. Дерево в Доте (по понятным причинам) достать было нельзя и на вопросы новичков:
+-Где достать дерево?
+добрые друзья отвечали
+- alt+q+q
+=)
+
+
+
+Ответить
+
+
+@risengod4406
+4 года назад
+Топовый видос от топового человека
+
+
+
+Ответить
+
+
+@Aabbcczzxxcc
+4 года назад
+Помню была книжка на сегу у меня для мк2, до сих пор в памяти abbczxy или как то так ))
+
+1
+
+
+Ответить
+
+
+@IvanIvanov-dl1rq
+4 года назад
+Интересно. Давай ещё. Ретро.
+
+
+
+Ответить
+
+
+@ManOkaR
+4 года назад
+Поправочка, летать на танке через стрельбу назад в Вайс Сити можно было без чит-кода. Так работала механика отдачи орудия танка сама по себе
+
+
+
+Ответить
+
+
+@eviltima
+4 года назад
+Мне нравились мутаторы в анрил тонамент. Скорость в процентах.
+
+
+
+Ответить
+
+
+@chai731
+2 года назад
+Мне очень понравилось то как разрабы дума поступили с читами, в етернал это посхалки к читам из старого дума ввиде катреджей а в 16 это легальные бонусы на уровнях
+
+
+
+Ответить
+
+
+@ifox_live
+4 года назад
+В казаках, не помню точно что надо было писать там, но можно было наклипать любое количество любых войск в любой карте или сценарии)
+
+
+
+Ответить
+
+
+@leer74
+3 года назад
+за винамп и двор, стреляю в упор
+
+
+
+Ответить
+
+
+@sapojnik_lubit_popizdet
+4 года назад
+В анчартедах был, правда не чит, а функция, когда можно было Дрейка сделать жирным) прикольно
+
+
+
+Ответить
+
+
+@user-lw8le5zu3g
+4 года назад (изменено)
+О Свендук ещё не успел спереть тему для видео
+
+
+
+Ответить
+
+
+@CAPTAIN__RUSSIA
+4 года назад (изменено)
+Штирлиц все стрелял и стрелял в Бормана.
+Борман все не падал и не падал.
+IDDQD — подумал Штирлиц.
+IDKFA — подумал Борман.
+
+PS: 9:30 Как так не ведётся? Ведётся, самым радикальным способом - запретом gamedev и читерство изживёт себя.
+
+
+
+Ответить
+
+
+@user-ou3kh4iq4w
+4 года назад
+Говоря про читы - у меня до сих пор в коробке из под "Героев 3: Возрождение Эрафии" лежит листок с читами на бессмертие, ходы, магию и Архангелов. Но игра на это ругалась, обзывала тебя читаком и ссылала на последнее место в рейтинге. Печалька! -_-
+
+
+
+Ответить
+
+
+@user-ee9ue5sn7l
+4 года назад
+Я обожал через консоль в Half-Life 2 менять урон у монтировки. Враги буквально летали по карте от огромного урона. Так же, я просто обожал в начале ввести impulse 101 и делал себе финальный гравити ган. Был момент, когда в халф-лайф забиндил всякие команды на клавиши. Команды были по типу "god", "noclip" и прочее. Не знаю, можно ли это считать за читерство, но я обожал швырять противников по карте, кидать на километры коробки и удалять npc во время катсцены :)
+
+
+
+Ответить
+
+
+@user-fe4nv6te8b
+4 года назад
+На мк трилоджи л1р1л2р2+вверх открывал всех персонажей и фаталити с одной кнопки - это первый, который пришёл в голову)
+
+
+
+Ответить
+
+
+@paukangibson4636
+4 года назад
+Ну артмани не чит, там просто значения люди меняли, чаще всего это делали в играх где надо много задротить и люди не хотели тратить на это время, поэтому просто ломали деньги или ресурсы, что кстати логично, некоторые разрабы настолько головой поехавшие, что могут такой гнилой экономики в игру напихать, что артмани скорее становится заплаткой к игре, а не читом
+
+4
+
+
+Ответить
+
+
+@edkachalov
+4 года назад
+У Стим есть античит?
+- Ах-ха-ха.
+
+13
+
+
+Ответить
+
+
+@friendlykiska8361
+4 года назад
+А мой любимый чит-ванпанч чит в ГТА СА. Убивать всех с 1 удара и откидывать на много метров было очень весело
+
+
+
+Ответить
+
+
+@shinkey7808
+4 года назад (изменено)
+Сразу 2 ролика в один день? 
+*О май гад, Кома, ты что крейзи? *
+
+
+
+Ответить
+
+
+@mastergrad9293
+4 года назад
+Помню, в одной игре был чит, который менял звуки выстрелов с реалистичных на издаваемые людьми, типо: "Пиу-Пиу", "Вжу-у-ух", "Тух-Тух".
+
+
+
+Ответить
+
+
+@MacSandae
+4 года назад
+Интересный чит на скайрим, открыть все локации на карте, это капец как интиресно, и можно много нового найти
+
+
+
+Ответить
+
+
+@ZzZo6JIuH
+4 года назад
+У меня на Соньке первой был Взломщик Кодов 9000 - это вам не ГеймГуру :)
+
+
+
+Ответить
+
+
+@tyurm
+4 года назад
+Код конами был в Anthem. Когда надо нажать старт и надо ввести код.
+
+
+
+Ответить
+
+
+@user-nt2up8oz2e
+4 года назад
+И ушел в никуда )))))
+
+1
+
+
+Ответить
+
+
+@criticaldamage5878
+4 года назад
+Теперь новый тренд! И вместо читов разработчики дарят нам баги! Такая же весёлая фигня, но случается не по воле игрока
+
+1
+
+
+Ответить
+
+
+@burlit33
+2 года назад
+Лучший выпуск
+
+
+
+Ответить
+
+
+@TechnoTurianArtem
+4 года назад
+Лайкос за звук активации чита из San Andreas.
+
+
+
+Ответить
+
+
+@user-iv7ke8lk5f
+3 года назад
+Читы читами до поры до времени, одно дело в одиночной другое дело в сетевых играх
+
+
+
+Ответить
+
+
+@agoodbard7867
+4 года назад
+Эхх...помню как в детстве баловался с кодами в 3 и 4 героях...
+
+
+
+Ответить
+
+
+@paromshikstixa1323
+4 года назад
+Прикольно не именно читы, а файл handling в папке data. В GTA3, VC, SA
+
+
+
+Ответить
+
+
+@user-oy4rs3kx9r
+4 года назад
+В опере тоже есть конами код, если ввести его то открывается меню доп. Настроек
+
+
+
+Ответить
+
+
+@user-lj8wh4oe2h
+4 года назад (изменено)
+В Симсе читы уже не фановая вещь, а инструмент, с которым играют на постоянной основе девочки(я). Увеличивать максимальное кол-во персонаже в семье,  редактирование некоторых игровых механик(продолжительность жизни персонажа и отдельного возраста, продолжительность беременности, та даже длительность игровой минуты можно изменить). Есть целый мод, который позволяет все перелопатить, который обновляют для каждой новой версии игры. И это только то, что имеет практическое значение. Но самое крутое, что можно добавить смерть в семью, раздеть её/его, и понять, что это негр
+
+
+
+Ответить
+
+
+@silentip_design
+4 года назад (изменено)
+Никак не мог привыкнуть к туману войны в StarCraft и WarCraft 3, по этому всегда играл с читом на снятие тумана. Как можно понять работает это только в одиночной кампании. В других играх читы не использую
+
+
+
+Ответить
+
+
+@DeadPhilosof
+4 года назад
+В свое время (довольно давно) в ммошке одной корейской, которая  в россии издавалась инновой, получал вещи которые даются за премиум подписку, путем перехвата и подмены пакетов данных.
+Забавное было время!
+
+
+
+Ответить
+
+
+@alienwalker6219
+4 года назад
+С помощью трейнера добавил в нфс карбон беху из заставки в начале и прошел на ней игру.
+
+
+
+Ответить
+
+
+@user-ze6kj3ib3z
+4 года назад
+Wolfenstein(2009) чит превращает головы противников в огромные тыквы и чит в котором противники при смерти разлетаются в виде колёс
+
+
+
+Ответить
+
+
+@pavelklipp3760
+4 года назад
+При упоминании artmoney  и chemax сразу улыбнуло.
+
+
+
+Ответить
+
+
+@user-notanoty
+4 года назад
+Эх видео блуджать пересмотреть захотелось
+
+4
+
+
+Ответить
+
+
+@user-bf3dz3gf5d
+4 года назад
+А как же макросы? В той же варфасе макросы на мышку убирают отдачу, любая пушка превращается в луч смерти.
+
+
+
+Ответить
+
+
+@sonairys929
+4 года назад
+9:40 Тук-тук-тук-тук-тук-тук-тук МУУУАААААААААА
+
+
+
+Ответить
+
+
+@user-sy3fq3in8e
+4 года назад
+А чем сейчас пользуются вместо винампа?
+
+
+
+Ответить
+
+
+@OlegSmileSSToRM
+4 года назад
+Gta samp мультиплеер в са, обожал заходить в магазин оружия, там всегда куча народа закупали пушки, я спамил самолет и закрывал им выход, заблокированным игрокам оставалось ничего кроме как ждать или перезаходить, теряя все купленное оружие, урон в магазинах был отключен если что. Ох сколько пердаков я поджег, ни капельки не жалею
+
+
+
+Ответить
+
+
+@Golover_Vol
+4 года назад
+В Fortnite отсылка скорее не к Gradius, а к Space Invaders
+
+
+
+Ответить
+
+
+@SephirothMind
+4 года назад
+Читерство убило одну мультиплеерную стрелялку, была такая, S4 называлась ( жаль, если честно - она была очень веселая
+
+
+
+Ответить
+
+
+@user-iw5kh5ui7d
+4 года назад
+Вижу рестарт - жму автоматом лайк.
+
+
+
+Ответить
+
+
+@tonyaddams
+4 года назад
+THPS 2 - читы как фича: список читов открывался по мере задрачивания игры на 100% за всех скейтеров и там были как раз большие головы, левитация и прочие приколюхи которыми не грех разнообразить досуг в любимой игре когда уже всё прошёл и всё надоело.
+
+1
+
+
+Ответить
+
+
+@Zeeken_Zeeken
+4 года назад
+GTA III : чит на то, чтоб все "npc"охожие были ко всем враждебными + чит, чтоб у них всех было рандомное оружие. Как итог: Полный трэш. Долго так развлекался. Вот он "Сурвайвал"! =)
+Если сюжетку не прошёл, лучше не портить этим сохранения, ибо при загрузке их, некоторые коды оставались даже после полного перезапуска игры. Либо сохранять такие фишки отдельным слотом. Эх, ностальгия =)
+
+
+
+Ответить
+
+
+@perisait5335
+4 года назад
+Стрельба котами в Postal 2,  супер чит код)
+
+
+
+Ответить
+
+
+@danted9490
+4 года назад
+Хочешь узнать как работает спецназ? Узнать всё о тактике и стратегии боя? Всего этого нет в "Калибр"
+
+
+
+Ответить
+
+
+@Gordon_Workshop
+4 года назад
+Читерил всего 1 раз в онлайне. Неосознанно. У меня на ГТА СА стоял CamHack(свободный полёт камеры). Я изучал катсцены с разных ракурсов и просто летал куда глаза глядят. Когда начал играть в САМП совершенно случайно заметил что он работает и в онлайне. Я мог на РП сервере подслушивать разговоры которые ведутся далеко от меня наблюдая за текстом над их головами, ведь сообщения не транслируются в чат на большое расстояние.
+
+1
+
+
+Ответить
+
+
+1 ответ
+
+@stefan-vj2wb
+4 года назад
+Debug mode в классических Сониках
+
+
+
+Ответить
+
+
+@rustam6446
+4 года назад
+какой сатурн? про дримкаст где обещанное видео?)
+
+1
+
+
+Ответить
+
+
+@vfgb2010
+4 года назад
+Машина из конца первой мафии. Чтобы её получить, нужно было выстрелить в нужную точку маяка на одном из мостов, а затем отправиться за этой самой машиной в нужное место.
+Как это умудрились обнаружить для меня загадка.
+
+
+
+Ответить
+
+
+@user-ry7gd1gx1k
+4 года назад
+Все любят ВХ и Аим, но только истинные гурманы оценят HESOYAM
+
+1
+
+
+Ответить
+
+
+@oldpirate651
+4 года назад
+Самый лучший чит - прямые руки и большой IQ
+
+
+
+Ответить
+
+
+@user-bb9wf3kg7k
+4 года назад
+В 4 ассасине и 2 прототипе были весьма интересные читы
+
+
+
+Ответить
+
+
+@Altus6969
+4 года назад
+Бессмертие в шахматах...
+
+
+
+Ответить
+
+
+@user-zt5vi8im9g
+4 года назад
+8787898 на бессмертие в игре на старых мобильниках про красный мячик)))
+
+
+
+Ответить
+
+
+@lithiumredhead
+4 года назад
+Помню, использование Art Money доставляло истинное удовольствие! Особенно, когда удавалось изменить нужные значения. Ого, вот я хакером был крутым!
+
+
+
+Ответить
+
+
+@AlBEREZIN88
+4 года назад
+Мне больше верится, что чит коды сделаны именно разработчиками для разработчиков, тупо чтоб было легче пройти игру. А теперь можно за бесплатно нанимать тестеров, а в некоторых случаях даже сами люди за бетотест заплатят бабки
+
+
+
+Ответить
+
+
+@MasterKolis
+4 года назад
+Чит код на расчленёнку лазерным мечом в Джеди Ауткасте и Джеди Академии)
+
+1
+
+
+Ответить
+
+
+@vanhoen89
+4 года назад
+heretic была такая игра на  dreamcast помню
+
+
+
+Ответить
+
+
+@user-wd4lx2yh8v
+4 года назад
+Ахахах! Калибор! xD Вот уморил)
+
+
+
+Ответить
+
+
+@user-bg8un1rj3c
+4 года назад (изменено)
+Меня смущает что Каргинов ушел из Стэндапа на ютьюб,но я подпишусь...
+
+
+
+Ответить
+
+
+@marcus_n_kane2048
+4 года назад
+чит-нечит, но в легендарной Fallout 2 к 7  уровню можно было ездить на Хайвэмене в силовой броне с импульсной пушкой на перевес) В Red Allert можно было закидать всё ядрёными бомбами) 
+
+А в WOT до сих пор лепят отмазки про неразглашение ников забаненных за применение запрещённых модов...
+
+
+
+Ответить
+
+
+@user-nk9zx9ru5v
+4 года назад
+В постале можно было сделать огненную ссанину и стрелять кошками - о времена о нравы
+
+
+
+Ответить
+
+
+@dimonsd8464
+4 года назад
+Пользуюсь save wizard ps4, потому что нет много времени на игры, приходится пользоваться кодами.
+
+
+
+Ответить
+
+
+@eriksssss
+4 года назад
+Отличная производительность!
+
+
+
+Ответить
+
+
+@vitoandolini6089
+1 год назад
+В игре pro evolution soccer 2004 или 2005 можно было менять головы футболистов на голову акулы, опять таки большие головы самих футболистов, ещё что то. Вообщем было угарно с этими бошками бегать по полю.
+
+
+
+Ответить
+
+
+@ammonjerro396
+4 года назад
+Я бы читеров на кол сажал. Читы использовал только в оффлайн играх и когда они уже были неоднократно пройдены. Даже от уровня сложности сильно меняется геймплей игр, а когда читы используют, то вообще всё ломается.
+
+1
+
+
+Ответить
+
+
+@prososolek6515
+4 года назад
+Репачино, тебя не хватает
+
+
+
+Ответить
+
+
+@mukhitak1185
+4 года назад
+Command and Conquer. Есть чит который превращает людей в ресурсы и когда харвестер будет собирать ресурсы люди будут орать будто бы их крамсают и забивают
+
+
+
+Ответить
+
+
+@chaoticgoodwarlock4142
+4 года назад
+Пока не посмотрел видео, и не услышал что сказал автор, вангую. Читы стали чем-то плохим когда началось ПвП.
+
+
+
+Ответить
+
+
+@Taumler
+4 года назад
+Сценарии у Булджать приобретаете?
+
+1
+
+
+Ответить
+
+
+@roman354
+4 года назад
+Читы и сейчас делают в играх, но теперь они называются "тайм сейверами" и продаются самими разработчиками...
+
+
+
+Ответить
+
+
+@PhoenixRZN
+4 года назад
+В детстве любил читы. Как сейчас помню "show me the money" в "Starcraft" или "coward" в "Аллодах". Но, повзрослев, стал проходить тоже "Starcraft" без них, посмотрел на игру в том виде, в каком задумывали разработчики. И понял, что потерял ОГРОМНУЮ долю удовольствия от игры. С тех пор перестал ими пользоваться. Сейчас их, в принципе, не уважаю и считаю прерогативой детей (они для себя могут найти в этом что-то весёлое). Хотя, самый зашквар - это легальные читы. Вроде платных и одноразовых пакетов "праксис" в "Deus ex 2" или несколько мешков бонусных 500 золота в первом 'Dishonored". Хоть и обладал лицензионной копией игры со всем дополнениями и имел полное право взять этот бонус. Специально оставлял на столе. Если разработчики решили, что в начале должно быть мало денег и сложно, то мне эти платные бонусы нафиг не нужны.
+
+
+
+Ответить
+
+
+@user-zw1um5ee7t
+3 года назад
+Блин, вот я об этом не задумывался: тетрис образован от "тетра" - четыре. от нее же образована и тетрадь. следовательно, тетрис произносится через е.
+
+
+
+Ответить
+
+
+@user-nz8ki5qd1k
+4 года назад (изменено)
+Если бы не читы, то я бы, наверное, никогда не овладел x86 ассемблером. Одна из первых самописных программ как раз была процесс-патчером(тренер). Понятное дело, когда тебе уже за 30, запускать игрушки под отладчиком уже времени нет.
+
+
+
+Ответить
+
+
+@Izimirus
+4 года назад
+а что винампом перестали пользоваться ?
+
+
+
+Ответить
+
+
+@mrhironAB
+4 года назад (изменено)
+Эх... помню как в Act of War вводил читы которые добавляли спецназовца, джип ФБР или танк ммм... было круто делать спец операции во время компании. А еще крутой код есть на Квейк 4, когда появлялся бот (Солдат, Инженер или медик) Они конечно были тупые и не могли слушать команды, но ставить их в разных углах и что-бы они тебе помогали против НПС врагов было круто, создавалось ощущение что ты не один воюешь). а в HalfLife2  было круче там можно было забиндить и команды НПСам куда им идти, выбрать какого НПС спавнить, с каким оружием, а в РЕВЕНХОЛЬМЕ можно было сделать себя невидимым и спавнить комбайнов управляя ими, почти Гарис мод).
+
+
+А еще с помощью программы Cheat Engine, мы с другом по сети против друг друга, взламывали количество очков в игре (В ТЫЛУ ВРАГА 1,2) что позволяло нам создать для себя миссию по атаке базы, колонны и тд. + создание своих карт это дополняло. Читы в правильных руках это шикарная штука.
+
+
+
+Ответить
+
+
+@oleg8349
+4 года назад (изменено)
+Мне нравилась система читов в космических реджерах2 где ты покупал чит за внутри игровые дни: 10к кредитов стоило 10 дней, 1млн. 300 дней, уменьшить массу в два раза у всего оборудования 200 дней. Т.е. что бы получить лям ты должен был быть в "завязке" 300 игровых дней. Ввел чит счётчик сбросился, не хватает дней чит не будет работать...
+Потом разрабы с длс убрали ограничение и стало возможно любой чит в любое время вводить.
+
+
+
+Ответить
+
+
+@user-nf3id3gh8u
+4 года назад
+Ну тут сразу же лайк
+
+
+
+Ответить
+
+
+@nineouttaten
+4 года назад
+В qiwi банкомате можно было ввести IDDQD и играть в doom прямо в терминале
+
+
+
+Ответить
+
+
+@psboxlife9500
+3 года назад
+Один вывод хочешь играть без читов покупай консол
+
+1
+
+
+Ответить
+
+
+@user-io6pi8jc5z
+4 года назад
+В любой уважающей себя игре должен быть хоть какой-нибудь чит.
+
+
+
+Ответить
+
+
+@Viktor.Borisenko
+4 года назад
+Самые топовые читы в the elder scrolls. Просто консоль, которая способна выполнять все команды в игре))
+
+1
+
+
+Ответить
+
+
+1 ответ
+
+@user-nx3cu5nx4f
+1 год назад
+А че тут думать, "как из ребят которые просто хотели получить удовольствие от игры , читеры превратились в нарушителей"
+Потому что стали читерить в онлайн играх и мешать другим игрокам. Что тут думать ещё???
+
+1
+
+
+Ответить
+
+
+@Antizet
+4 года назад
+В гта есть и веселые читы, не скажу, что за чит, уже давно забыл, но можно сделать хаос, что бы все нпс избивали друг друга, летающие машины или наоборот, гравитацию увеличить, ход времени можно регулировать
+
+
+
+Ответить
+
+
+@forgiveness_denied
+4 года назад
+CheatMax  спасибо что напомнил
+
+
+
+Ответить
+
+
+@xxKorBoxx
+4 года назад
+Мои любимые читы- в Варкрафте 3, в Героях 3 и очень полезные читы есть в Киндом Кам. А ещё код Конами очень интересно работает в Бесконечном Лете
+
+
+
+Ответить
+
+@alexx92rus75
+4 года назад
+и тут калибр)
+
+
+
+Ответить
+
+@user-ys6zh2sp1w
+4 года назад
+В Saints Row 2 Любил читами увеличивать модельку героя и выставлять низкую гравитацию и так я  мог летать по всей карте будучи гигантом
+
+
+
+Ответить
+
+
+
+25:28
+Текущее видео
+30 ЛЕТ РЕПУТАЦИИ В ПОМОЙКУ || ТРАГЕДИЯ FALLOUT 76
+Restart
+948 тыс. просмотров 5 лет назад
+
+
+13:42
+Текущее видео
+ПОЛУЧАЮ IPhone за 1 РУБЛЬ!? ЧТО ЭТО НА САМОМ ДЕЛЕ? ПРОВЕРКА РЕКЛАМЫ
+EVG
+24 тыс. просмотров 4 часа назад
+Новинка
+
+
+1:12:00
+Текущее видео
+Крафт предметов для Архимага
+GoodBoy TV
+7,4 тыс. просмотров 7 дней назад
+
+
+22:28
+Текущее видео
+КАК ИЗДАТЕЛИ МАНИПУЛИРУЮТ ИГРОКАМИ
+Restart
+184 тыс. просмотров 4 года назад
+
+
+16:31
+Текущее видео
+Грамотный технический специалист осаживает ноутбукера
+NOTEBOOKER
+756 тыс. просмотров 3 года назад
+
+
+9:34
+Текущее видео
+БЕРЕМЕННА В 16 АНТИ-ВЕРСИЯ (ПЕРЕОЗВУЧКА) #11
+АНТИ-ВЕРСИЯ
+256 тыс. просмотров 1 год назад
+
+
+18:51
+Текущее видео
+📂💻 КТО И КАК ЛОВИТ ХАКЕРОВ Отдел К / КИБЕРПОЛИЦИЯ
+Scammers
+1,2 млн просмотров 2 года назад
+
+
+15:35
+Текущее видео
+САМЫЕ ТУПЫЕ ЛАЙФХАКИ - Проверил ВИРУСНЫЕ ЛАЙФХАКИ ИЗ ТИК ТОКА
+Дима Масленников
+7,6 млн просмотров 4 года назад
+
+
+10:37
+Текущее видео
+СтопХам-"Быдло Баба"
+СтопХам Мск
+1,8 млн просмотров 5 лет назад
+
+
+37:24
+Текущее видео
+Ночь в БОЛЬНИЦЕ с Призраками... Такого я не ОЖИДАЛ! GhostBuster
+Дима Масленников
+10 млн просмотров 5 лет назад
+
+
+16:57
+Текущее видео
+Магнитофон Орель-101-1 Стерео (Разбираем, измеряем, слушаем и смотрим схему)
+Алексей Морозов
+17 тыс. просмотров 12 дней назад
+
+
+29:11
+Текущее видео
+На что способны эмуляторы сегодня?
+Restart
+384 тыс. просмотров 2 года назад
+
+
+17:16
+Текущее видео
+ИГРЫ НЕ ПО ПРАВИЛАМ
+Restart
+225 тыс. просмотров 4 года назад
+
+
+23:52
+Текущее видео
+Компьютерный мастер нагло разводит клиента на деньги
+NOTEBOOKER
+3,1 млн просмотров 4 года назад
+
+
+9:17
+Текущее видео
+БЕРЕМЕННА В 16. УКРАИНА АНТИ-ВЕРСИЯ (ПЕРЕОЗВУЧКА) #2
+АНТИ-ВЕРСИЯ
+545 тыс. просмотров 5 лет назад
+
+
+25:25
+Текущее видео
+КРУТОЙ ЭКСПЕРИМЕНТ В ПЯТЕРОЧКЕ / ЧТО БУДЕТ ЕСЛИ ПОКУПАТЕЛИ БУДУТ РАБОТАТЬ ЗА СОТРУДНИКОВ МАГАЗИНА
+Просрочка Патруль-Нижний Новгород
+137 тыс. просмотров 2 года назад
+
+
+17:39
+Текущее видео
+ПРОНИКАЮ НА РАБОТУ В ТЕЛЕМАГАЗИН - Анкеты и Собеседование в ЛЕОМАКС
+EVG
+274 тыс. просмотров 5 месяцев назад
+
+
+17:26
+Текущее видео
+💻ЧТО Я МОГУ СДЕЛАТЬ ЗНАЯ ТВОЙ IP АДРЕС
+Scammers
+1,7 млн просмотров 3 года назад
+
+
+23:53
+Текущее видео
+PS3 и Xbox360 ещё могут вас удивить
+Restart
+433 тыс. просмотров 2 года назад
+
+
+15:48
+Текущее видео
+ГАЗИРОВАННЫЙ ПЕРЕДОЗ
+sndk
+5,5 млн просмотров 2 года назад
+
+
+14:15
+Текущее видео
+ИГРЫ ПОГУБИВШИЕ СЕРИЮ
+Restart
+172 тыс. просмотров 4 года назад
+
+
+34:23
+Текущее видео
+Прожарка валуйского шушпана Саши валсервиса. Часть 2
+NOTEBOOKER
+105 тыс. просмотров 2 месяца назад
+
+
+33:40
+Текущее видео
+Кампания людей #8 - Warcraft II: Приливы Тьмы [Tides of Darkness] #warcraft #TidesofDarkness
+Tiger_Skif
+24 просмотра 9 часов назад
+Новинка
+
+
+53:01
+Текущее видео
+НОЧЬ в ЗАБРОШЕННОМ ГОРОДЕ с ПРИВИДЕНИЯМИ | GhostBuster
+Дима Масленников
+11 млн просмотров 3 года назад
+
+
+58:30
+Текущее видео
+История краха Siemens
+stupidmadworld
+967 тыс. просмотров 9 месяцев назад
+
+
+28:53
+Текущее видео
+Retroarch. Шейдеры. Эффекты старого телевизора и не только.
+Maelstrom
+5,7 тыс. просмотров 2 недели назад
+
+
+14:21
+Текущее видео
+ЛЕЧЕБНЫЙ ПЕРЕДОЗ | Странная реклама лекарств на телевидении | Сыендук
+sndk
+8,7 млн просмотров 5 лет назад
+
+
+21:16
+Текущее видео
+Steam Controller навсегда изменил ПК гейминг
+Restart
+233 тыс. просмотров 2 года назад
+
+
+30:38
+Текущее видео
+✅Купил МИСТЕРИ БОКС с iPhone, но они ПРИСЛАЛИ ЭТО!
+EVG
+657 тыс. просмотров 1 год назад
+
+
+17:33
+Текущее видео
+НОВЫЙ СТРАШНЫЙ ВИРУС - MrsMajor3.0.exe VS CORONAVIRUS.EXE | VIRUS BATTLE и судья ArtMoney
+overbafer1
+1,1 млн просмотров 4 года назад
+
+
+22:21
+Текущее видео
+ФЕНОМЕНАЛЬНОЕ ВЫЖИВАНИЕ НА AM2+ В 2024 ГОДУ
+Maddy MURK
+154 тыс. просмотров 4 недели назад
+
+
+18:59
+Текущее видео
+ЧТО Я МОГУ СДЕЛАТЬ ЗНАЯ НОМЕР ТВОЕЙ КАРТЫ
+Scammers
+1,4 млн просмотров 3 года назад
+
+
+17:31
+Текущее видео
+ПЛОХИЕ ИГРЫ В КОТОРЫЕ СТОИТ ПОИГРАТЬ
+Restart
+159 тыс. просмотров 4 года назад
+
+
+23:37
+Текущее видео
+✅СМАРТФОН ОТ СПЕЦСЛУЖБ ИЗ ТЕЛЕМАГАЗИНА / Ожидание и Реальность
+EVG
+1,4 млн просмотров 2 года назад
+
+
+10:35
+Текущее видео
+ПОХОРОНИТЕ МЕНЯ ЗА ПЛИНТУСОМ АНТИ-ВЕРСИЯ (ПЕРЕОЗВУЧКА) #2
+АНТИ-ВЕРСИЯ
+520 тыс. просмотров 4 года назад
+
+
+13:25
+Текущее видео
+Вирусология - 1 час БЕЗ АНТИВИРУСА на Windows 10 | Windows 10 Destruction
+overbafer1
+683 тыс. просмотров 2 года назад
+
+
+1:23:11
+Текущее видео
+СтопХам-Лучшее #5 в FullHD
+СтопХам Мск
+163 тыс. просмотров 2 месяца назад
+
+
+14:36
+Текущее видео
+Nintendo Wii и фитнесс игры
+Restart
+95 тыс. просмотров 3 года назад
+
+
+9:16
+Текущее видео
+Лучшие связки CPU + GPU. Примеры оптимальных сборок ПК 2024.
+stupidmadworld
+171 тыс. просмотров 4 месяца назад
+
+
+22:20
+Текущее видео
+✅НЕ ЗАБИРАЮ ПОСЫЛКУ С ПОЧТЫ, КИДАЛА В ЯРОСТИ
+EVG
+2,1 млн просмотров 2 года назад
+
+
+
+BY
+
+Пропустить
+Введите запрос
+
+
+
+
+
+Фото профиля
+
+
+
+6:44 / 13:41 (11:49)
+Пропустить до Важное?
+
+
+ПОЛУЧАЮ IPhone за 1 РУБЛЬ!? ЧТО ЭТО НА САМОМ ДЕЛЕ? ПРОВЕРКА РЕКЛАМЫ
+
+EVG
+862 тыс. подписчиков
+
+Стать спонсором
+
+Вы подписаны
+Скачать
+720
+
+
+ 
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+ 
+ 
+,
+ 
+ 
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+ 
+ 
+ тыс.
+ 
+
+
+Поделиться
+
+Скачать
+
+Спасибо
+
+ 
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+ 
+ 
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+ 
+ 
+ 
+ 
+ 
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+ 
+ 
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+ 
+ 
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+ 
+ просмотра  
+ 
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+ 
+ часа назад  
+Научись создавать игры: https://go.skillfactory.ru/evg45
+Скидка -45% по промокоду «EVG45»
++курс английского в подарок …
+182 комментария
+NAAIN
+Введите комментарий
+
+Закреплено пользователем EVG
+@EVGpro
+4 часа назад
+Ну что, норм наш любимый ютубчик работает? Если что, некоторые способы по решению есть у меня в ТГ https://t.me/evgprotiv
+
+23
+
+
+Ответить
+
+
+7 ответов
+
+@lakslk
+4 часа назад (изменено)
+Наконец-то походу то самое разоблачение тупорылых тг каналов по типу: а вы знаете что можно получить ипхон за 1 рубль. На самом деле продавцы специально занижают цены ляляля чтобы они были в топе.... 
+
+Они настолько задолбали уже
+
+62
+
+
+
+Ответить
+
+
+@Skames
+4 часа назад
+0:52 коммент убил, на трассе была)
+Наверное там за рубль и получила айфон)
+
+16
+
+
+Ответить
+
+
+@Pavkill
+4 часа назад (изменено)
+Evg а помнишь вы с евреем ходили по вокзалам или искали всяких закладчикав, было очень интересно смотреть контент годов 20-21 было бы классно если бы вы это повторили.
+
+28
+
+
+Ответить
+
+
+3 ответа
+
+@xicckalle2456
+4 часа назад
+Обожаю видео, в которых ты проверяешь рекламу
+
+8
+
+
+
+Ответить
+
+
+@user-pv7zy8kb7c
+4 часа назад
+Наконец-то походу то самое разоблачение тупорылых тг каналов по типу: а вы знаете что можно получить ипхон за 1 рубль. На самом деле продавцы специально занижают цены ляляля чтобы они были в топе....
+
+7
+
+
+Ответить
+
+
+@ender489Xk0a
+4 часа назад (изменено)
+Бесплатный айфон только в шедеврорекламе
+
+8
+
+
+Ответить
+
+
+@ezert22
+4 часа назад
+Лайк и ты найдешь у себя под подушкой новенький айфон 16 S про Макс 1280gb
+
+97
+
+
+Ответить
+
+
+9 ответов
+
+@arti4606
+4 часа назад
+Если перестанешь говорить, что надо подписаться, то буду смотреть тебя с рекламой 
+
+2
+
+
+Ответить
+
+
+@Eiden2S
+2 часа назад
+если ты не можешь себе позволить айфон - то и нафуй он тебе нужен???
+что бл за культ на айфоны? это не квартира или машина без которых не обойтись
+
+4
+
+
+Ответить
+
+
+@user-yp5kb6gj4g
+3 часа назад
+там с этими подписками прикол в том что первый платеж 1 рубль а следующие будут 1000 рублей каждый день=))
+
+3
+
+
+Ответить
+
+
+@Ramenoxicous
+3 часа назад
+Похоже на рубрику канала недохакеры lite, а видос как обычно интересный
+
+3
+
+
+Ответить
+
+
+@Dencikos
+2 часа назад
+СПЕЦЫЫЫЫЫ!!! Слышали? Спецыыыы! Которые на варгейминг работали))) которые вам танки делают) аххахахахах если в варгейминг спецы,то тут все тупо хакеры сидят)
+
+4
+
+
+Ответить
+
+
+@Notbitdota
+2 часа назад (изменено)
+История у меня с gamesport есть. Не связана с айфоном а с «абузом - заработком». Вообщем я сделал как на видоса отправил 1р и дальше ждал. После чего мне сняло 200р тип продление подписки. Но я просто в тех. поддержку тинька написал и мне блокнули карту и скинули обратно 200р. Там ещё кешбек был поэтому ограбил казик на 1рубль
+
+3
+
+
+Ответить
+
+
+@inanemate
+3 часа назад
+Спасибо, что открываешь людям глаза.
+
+1
+
+
+Ответить
+
+
+@closinGG
+4 часа назад
+Лайк хоть поставь. Чтобы ютуб работал
+
+3
+
+
+Ответить
+
+
+@Maygli333
+3 часа назад
+Не наипеш не проживеш как говориться 
+
+
+
+Ответить
+
+
+@Сантик
+4 часа назад
+Ура, как раз хавать и у EVG новое видео:)
+
+2
+
+
+Ответить
+
+
+EVG
+·
+
+2 ответа
+
+@Denisko123
+37 минут назад
+Когда он сказал, что никто это не расследовал, я попытался вспомнить, у кого я пару недель назад уже видел такой ролик про айфон за рупь за раскрутку телеграмм каналов .
+
+
+
+Ответить
+
+
+@Ajj1555
+3 часа назад
+Проверь, пожалуйста, самсунги эски на вб)
+
+
+
+Ответить
+
+
+@Denisko123
+46 минут назад
+Я бы не верил этой ро-же - 0:25
+
+1
+
+
+Ответить
+
+
+@FractaIL
+1 час назад (изменено)
+Тамаев вышел на новый уровень скама - спонсорские ссылки
+
+
+
+Ответить
+
+
+@CosmoScienceHistoryProject
+3 часа назад
+Евг, попробуй проверить китайский Temu
+
+
+
+Ответить
+
+
+@GeorgeStyleAlfaX
+2 часа назад
+Ага, особенно написано servis. Даже не нрамотно написано.
+
+1
+
+
+Ответить
+
+
+@user-pc3kd2ki8j
+3 часа назад
+И в очередной раз спасибо за такие разборы
+
+
+
+Ответить
+
+
+@user-ts2ub3df6t
+4 часа назад
+ролик на глазах родился
+
+1
+
+
+Ответить
+
+
+@DotIdiot
+4 часа назад
+Только начал смотреть а уже понял что разоблачение будет интересным
+
+3
+
+
+Ответить
+
+
+@user-me26dyif
+4 часа назад
+Тапаем, тапаем 
+
+
+
+Ответить
+
+
+@QzeryX
+2 часа назад
+видео грузило 4 минуты чтобы посмотреть рекламу класс спс
+
+
+
+Ответить
+
+
+@user-fk1bi1wd3q
+57 минут назад
+после "кАстанай" можно дальше уже не проверять
+
+1
+
+
+Ответить
+
+
+@MrSvin
+53 минуты назад
+Тебе отправят те самые огромные кнопочные телефоны где даже java нету
+
+
+
+Ответить
+
+
+@Lipchanin1900
+3 часа назад
+Ты хотел сказать ,не весь этот путь,а этот квест до конца!
+
+2
+
+
+Ответить
+
+
+1 ответ
+
+@Strange2626
+2 часа назад
+Здравствуйте!  EVG хотел поблагодарить вас за такой топовый контент. Смотрю вас с 2020 года .
+
+
+
+Ответить
+
+
+@user-st1kv8yz7y
+3 часа назад
+Урааа новое видео
+
+
+
+Ответить
+
+
+@agentfoxy0077
+4 часа назад
+24 секунды назад 0 просмотров,скатился....
+
+2
+
+
+Ответить
+
+
+@Maygli333
+3 часа назад
+Ахахахах, ппц дич 
+
+
+
+Ответить
+
+
+@User137rztm
+3 часа назад
+Бесплатный сыр только в мышеловке
+
+
+
+Ответить
+
+
+@golubcheck8378
+4 часа назад
+Посмотрел, удаляй
+
+11
+
+
+Ответить
+
+
+@Stanley.Ipkiss1986
+3 часа назад
+Еее, в числе первой сотни комментаторов)
+
+
+
+Ответить
+
+
+@user-tz6ok6wr9d
+3 часа назад
+Заблокируй альбине карту
+
+
+
+Ответить
+
+
+@sony-ni6eh
+3 часа назад
+Ура новый видос
+
+
+
+Ответить
+
+
+@aircommunity1158
+3 часа назад
+Что за игра на 1:51 ?
+
+
+
+Ответить
+
+
+@SonicBlast-se4yq
+1 час назад
+Как говорил мой папинька = НА ШАРУ БЫВАЕТ ТОЛЬКО ШАРОВАЯ МОЛНИЯ
+
+
+
+Ответить
+
+
+@MrMax-youtube
+1 час назад (изменено)
+Костанай! Мы же не говорим Масква.
+
+1
+
+
+Ответить
+
+
+2 ответа
+
+@MrHanma_word_strong
+1 час назад
+Жека где ержан? Покажи нам ежа!!!!!
+
+
+
+Ответить
+
+
+@Anime-je1bo
+3 часа назад
+Полоска на кофте желтая лагатип тоже, должна быть белая.
+
+
+
+Ответить
+
+
+@StarCo11
+52 минуты назад
+Абстрактное но понятно. 
+Спасибо и большой Привет  🫡
+
+
+
+Ответить
+
+
+@whiteglory2973
+2 часа назад
+я что рекламу зашел смотреть?
+
+
+
+Ответить
+
+
+@Guvibi
+4 часа назад
+Ты топ.всегда тебя смотрю.
+Спасибки за ролик
+
+
+
+Ответить
+
+
+@Wi-zl
+4 часа назад (изменено)
+все мы первые)
+
+1
+
+
+Ответить
+
+
+@fipysto
+1 час назад
+Вроде этот тренд был в вк в 2014
+
+
+
+Ответить
+
+
+@DANT3GameChannel
+3 минуты назад
+Не понял, я подписался на твой телеграмм где мой обещанный айфон, ты в видео обещал!!!
+
+
+
+Ответить
+
+
+@user-vb8ez3lb6f
+2 часа назад
+Бородатый, давай горе-сборку ПК
+
+
+
+Ответить
+
+
+@user-xy9lr3lh9k
+2 часа назад
+Я до конца верил 
+
+
+
+Ответить
+
+
+@Nikrusboy6
+3 часа назад
+Помню, в 16 году.. какие-то  звёзды разыгрывали iPhone 7 за подписку в инсте, реально было угарно
+
+
+
+Ответить
+
+
+@Herdgang
+51 минуту назад
+Жека я специально приехал в турцию отдыхать что бы поддержать тебя с моего проссмотра
+
+
+
+Ответить
+
+
+@IvanIvanx-rk6ss
+2 часа назад
+У меня на этот блудняк не хватило БЫ  нервов ЕВГ КРАСАВЧИК
+
+
+
+Ответить
+
+
+@Therealalex_82
+4 часа назад
+
+
+
+
+Ответить
+
+
+@_nekit_off
+1 час назад
+Имба
+
+1
+
+
+Ответить
+
+
+@DorathWertu
+3 часа назад
+У меня сегодня день рождения
+
+
+
+Ответить
+
+
+@hazel0001
+4 часа назад
+Красава
+
+
+
+Ответить
+
+
+@user-ps1dx6yw4s
+4 часа назад
+Под чем говорили что продают айфон бесплатно !?
+
+
+
+Ответить
+
+
+@elviraeys
+2 часа назад
+мдааа. почему в бесплатную технику кто-то еще верит
+
+
+
+Ответить
+
+
+@SkilozaYT
+4 часа назад
+
+
+
+
+Ответить
+
+
+@user-qg3hc3uk9e
+3 часа назад
+Да подписался я
+
+
+
+Ответить
+
+
+@Dmitrii359
+2 часа назад
+на 3 минуте 22 секунды говорит Еврей ?
+
+
+
+Ответить
+
+
+@ELMEEV
+49 минут назад
+Снова обманули? Эх
+
+
+
+Ответить
+
+
+@IvanZob24
+1 час назад
+ура евг молодцом, достали через каждое видео, кто в это верит почему списаные айфоны в идеале стоят 1 рубль а на авито айфон 14 с разбитым экарном 15к ?
+
+
+
+Ответить
+
+
+@MrMax-youtube
+1 час назад
+60% это те люди которых ты разоблочаешь. Дай проработать брат по братски!
+
+
+
+Ответить
+
+
+@scoombria_
+1 час назад
+недохакеры лайт раньше всё показал
+
+
+
+Ответить
+
+
+@vladick510
+2 часа назад
+Наконец-то кто-то снял видео про эту хуйню
+
+
+
+Ответить
+
+
+@yummysausage228
+1 час назад
+пока люди юзают крутые гайды как исправить ютуб, у меня ничё не получится, т.к у меня линукс блэт
+
+
+
+Ответить
+
+
+@azameyker813
+4 часа назад
+нормально так меньше, меньше минуты назад
+
+
+
+Ответить
+
+
+@user-ml1wq2go6x
+3 часа назад
+Бегу за айфоном
+
+
+
+Ответить
+
+
+@NikitaCaptain
+4 часа назад
+1
+
+2
+
+
+Ответить
+
+
+1 ответ
+
+@user-vb8ez3lb6f
+2 часа назад
+Ещё и весь в татухах! Где сидел? Мыло в душе не ронял?
+
+
+
+Ответить
+
+
+@smalik2626
+4 часа назад
+Последний
+
+
+
+Ответить
+
+
+@3lowwkolnuk
+3 часа назад
+Что за обман, зашел было 0секунд публикации зашел уже час прошел, хотел написать <<Первый>> 
+Ролик топ
+
+
+
+Ответить
+
+
+@Red-io3io
+4 часа назад
+0 просмотров 9 лайков
+
+
+
+Ответить
+
+
+@user-ml8tf8tq7m
+2 часа назад (изменено)
+Замеры никогда не поведут на такую фуйню. Это чисто для бумерков разводняк.
+
+
+
+Ответить
+
+
+@chota228
+1 час назад
+на озон это легально там за звезды и 1 рубль можно покупать технику но фармить звезды заебешься
+
+
+
+Ответить
+
+
+@NoNameUserXD
+3 часа назад (изменено)
+По просмотрам сейчас будет хреново т.к у многих ютюб не работает
+
+1
+
+
+Ответить
+
+
+3 ответа
+
+@inside7938
+2 часа назад
+Больше удивляют коменты под такими роликами . Реально сидят детишки , которые свято верят в бесплатные айфоны
+
+
+
+Ответить
+
+
+@Флибустьер
+2 часа назад
+Кликни,регнись,подпишись и так раз за разом.))))) без лоха и жизнь плоха
+
+
+
+Ответить
+
+
+@user-ob6ic9wh7n
+3 часа назад
+подписьки рулят.
+
+
+
+Ответить
+
+
+@Dikey2000
+2 часа назад
+В нашей стране халявы нет.
+
+
+
+Ответить
+
+
+@user-klmbmgq
+59 минут назад
+Я тоже решался на этом сайте они у меня деньги снимали по 170 250 70 за всякие покупки
+
+
+
+Ответить
+
+
+@makaka_nakakal
+4 часа назад
+эщкере
+
+
+
+Ответить
+
+
+@MrHeromantt
+53 минуты назад
+Хрен с тобой.уговорил -подписался))))
+
+
+
+Ответить
+
+
+@Truth1717
+4 часа назад
+Ы
+
+
+
+Ответить
+
+
+@Monstreki
+2 часа назад
+Мне всегда бесило а не кто не правервл а евг пришёл и проверил во это понимаю
+
+
+
+Ответить
+
+
+@user-ob7hr4ht4g
+1 час назад
+За это реально стыдно.
+
+
+
+Ответить
+
+
+@srancha
+4 часа назад
+Первый
+
+1
+
+
+Ответить
+
+
+@user-vt9ku6nj7r
+4 часа назад
+5й
+
+
+
+Ответить
+
+
+@DrollCats123
+1 час назад
+Кто из 2024 лайк)
+
+1
+
+
+Ответить
+
+
+@CosmoScienceHistoryProject
+3 часа назад
+Где видео с бомжами?
+
+
+
+Ответить
+
+
+1 ответ
+
+@user-nm7iz9dr5e
+4 часа назад
+третий
+
+
+
+Ответить
+
+
+@Vovka_9899
+4 часа назад
+Да, я не могу себе позволить айфон. Но могу купить себе Самсунг за 120 или 200 тысяч рублей. 
+
+
+
+Ответить
+
+
+@forgesten
+4 часа назад
+ЕЕЕЕ
+
+
+
+Ответить
+
+
+@maxviper916
+4 часа назад
+Я первый
+
+
+
+Ответить
+
+
+@alexander0m
+26 минут назад
+Евг и бесконечные подписки на мусорные паблики
+
+
+
+Ответить
+
+
+@residentevil5446
+8 минут назад
+жек а зачем нам телефон гея? ксяёме лутше намного тыж сам говорил
+
+
+
+Ответить
+
+
+@gearsnek9927
+18 минут назад
+Старыйбох
+
+
+
+Ответить
+
+
+@user-sr8fu5bs4l
+3 часа назад
+Накой нужен Айфон когда есть Самсунг?
+
+
+
+Ответить
+
+
+1 ответ
+
+@rrreval8579
+4 часа назад
+ГОЙДА
+
+
+
+Ответить
+
+
+@r9enji
+4 часа назад
+Евг, лайкни ком, пожалуйста
+
+1
+
+
+Ответить
+
+
+@Kartoshka_681
+4 часа назад (изменено)
+0 просмотров минуту назад, скатился.....
+
+2
+
+
+Ответить
+
+
+@rockbayan2769
+3 часа назад
+не подпишусь, рекламы много, нет цыгана
+
+
+
+Ответить
+
+
+1 ответ
+
+@Altair8909
+4 часа назад
+Очкарик, ты безнадежно дискредитировал себя, рекламой явных лохотронов.
+
+
+
+Ответить
+
+
+2 ответа
+
+@user-ik8dd3xs3w
+21 минуту назад
+Ема я очень хотел чтобы ты это проверил, лайк с ходу
+
+
+
+Ответить
+
+
+@user-olyx
+2 часа назад
+Прикольно. Это ж для тупых школьников. Только они ведутся.
+
+1
+
+
+Ответить
+
+
+@nameNPC
+2 часа назад
+Да ладно Жека в Казахстане в данный момент???
+
+
+
+Ответить
+
+
+@DEBIL777
+4 часа назад
+0 просмотров за 24 секунды скатился
+
+1
+
+
+Ответить
+
+
+@DEBIL777
+4 часа назад
+первый
+
+1
+
+
+Ответить
+
+
+@inst.obmenuaruss
+2 часа назад
+Проблема человечьего вида в том что он верит в случайность, думая что буду срать на голову всем, буду жадным и куплю айфон за 1 рубль в придачу 
+Это так не работает, если и будет халява то она будет заслуженная вами! А так же вы никогда не узнаете когда именно эта халява упадет вам на голову, а вся эта беготня это развод для лохов ;)
+
+1
+
+
+Ответить
+
+
+
+30:25
+Текущее видео
+МЬЮИНГ — САМЫЙ ОПАСНЫЙ МЕМ [Топ Сикрет]
+Utopia Live
+916 тыс. просмотров 1 день назад
+Новинка
+
+
+16:57
+Текущее видео
+Магнитофон Орель-101-1 Стерео (Разбираем, измеряем, слушаем и смотрим схему)
+Алексей Морозов
+17 тыс. просмотров 12 дней назад
+
+
+18:53
+Текущее видео
+УЛЬТРАНАСИЛИЕ и ЭДЖОВОСТЬ В ИГРАХ на примере Tormentor X Punisher и не только | Игровая рефлексия
+Keorph
+1,8 тыс. просмотров 1 день назад
+Новинка
+
+
+12:36
+Текущее видео
+ИГРА КОТОРУЮ ИСКАЛИ 20 ЛЕТ || ИСТОРИЯ BIO FORCE APE
+Restart
+175 тыс. просмотров 5 лет назад
+
+
+9:17
+Текущее видео
+БЕРЕМЕННА В 16. УКРАИНА АНТИ-ВЕРСИЯ (ПЕРЕОЗВУЧКА) #2
+АНТИ-ВЕРСИЯ
+545 тыс. просмотров 5 лет назад
+
+
+14:59
+Текущее видео
+Я УСТРОИЛСЯ НА ТУ САМУЮ РАБОТУ 220 000р в месяц
+EVG
+752 тыс. просмотров 11 месяцев назад
+
+
+58:30
+Текущее видео
+История краха Siemens
+stupidmadworld
+967 тыс. просмотров 9 месяцев назад
+
+
+10:37
+Текущее видео
+СтопХам-"Быдло Баба"
+СтопХам Мск
+1,8 млн просмотров 5 лет назад
+
+
+25:25
+Текущее видео
+КРУТОЙ ЭКСПЕРИМЕНТ В ПЯТЕРОЧКЕ / ЧТО БУДЕТ ЕСЛИ ПОКУПАТЕЛИ БУДУТ РАБОТАТЬ ЗА СОТРУДНИКОВ МАГАЗИНА
+Просрочка Патруль-Нижний Новгород
+137 тыс. просмотров 2 года назад
+
+
+22:21
+Текущее видео
+ФЕНОМЕНАЛЬНОЕ ВЫЖИВАНИЕ НА AM2+ В 2024 ГОДУ
+Maddy MURK
+154 тыс. просмотров 4 недели назад
+
+
+25:17
+Текущее видео
+САМАЯ ВАЖНАЯ ФУНКЦИЯ КОНСОЛИ, КОТОРОЙ НИКТО НЕ ПОЛЬЗУЕТСЯ
+Restart
+353 тыс. просмотров 4 года назад
+
+
+28:37
+Текущее видео
+Как ломали Xbox
+Restart
+765 тыс. просмотров 1 год назад
+
+
+20:46
+Текущее видео
+Жуткая ПОСЫЛКА с ДАРКНЕТ + Гусейн Гасанов
+Дима Масленников
+13 млн просмотров 5 лет назад
+
+
+25:40
+Текущее видео
+ЛУЧШИЙ ТЕЛЕФОН ДЛЯ СКУФА - OSCAL PILOT 2 - ТЕСТ И ОБЗОР
+Maddy MURK
+38 тыс. просмотров 2 дня назад
+Новинка
+
+
+34:23
+Текущее видео
+Прожарка валуйского шушпана Саши валсервиса. Часть 2
+NOTEBOOKER
+105 тыс. просмотров 2 месяца назад
+
+
+10:58
+Текущее видео
+ПОХОРОНИТЕ МЕНЯ ЗА ПЛИНТУСОМ АНТИ-ВЕРСИЯ (ПЕРЕОЗВУЧКА) #3
+АНТИ-ВЕРСИЯ
+343 тыс. просмотров 4 года назад
+
+
+1:19:52
+Текущее видео
+История краха BlackBerry
+stupidmadworld
+1,2 млн просмотров 1 год назад
+
+
+20:34
+Текущее видео
+ПОЗОРНАЯ ОТМЕНА WINDY31
+Jim Gold
+636 тыс. просмотров 4 дня назад
+Новинка
+
+
+38:52
+Текущее видео
+ВСКРЫЛИ ЗАБРОШЕННУЮ ТАЧКУ …. А ТАМ НЕРЕАЛЬНАЯ НАХОДКА!
+Дима Масленников
+9,6 млн просмотров 1 год назад
+
+
+40:17
+Текущее видео
+НОЧЬ на Острове с РЕАЛЬНЫМИ привидениями? GhostBuster Павелья
+Дима Масленников
+12 млн просмотров 6 лет назад
+
+
+
+BY
+
+Пропустить
+Введите запрос
+
+
+
+
+
+Фото профиля
+Главная
+Shorts
+Подписки
+Вы
+Мой канал
+История
+Плейлисты
+Ваши видео
+Смотреть позже
+Понравившиеся
+Ваши клипы
+Подписки
+
+Computers Cats and More
+
+Don Erondondon
+
+Uncle Knuckles
+
+1337LikeR
+
+[ПШ] — Послышалось!
+
+Access Tonight
+
+AdamThomasMoran
+Развернуть
+Навигатор
+В тренде
+Музыка
+Видеоигры
+Спорт
+Другие возможности
+YouTube Premium
+Творческая студия YouTube
+YouTube Music
+YouTube Детям
+Настройки
+Жалобы
+Справка
+Отправить отзыв
+О сервисеПрессеАвторские праваСвязаться с намиАвторамРекламодателямРазработчикам
+Условия использованияКонфиденциальностьПравила и безопасностьКак работает YouTubeТестирование новых функций
+© 2024 Google LLC
+
+17:16
+Текущее видео
+
+ИГРЫ НЕ ПО ПРАВИЛАМ
+Restart
+225 тыс. просмотров
+4 года назад
+
+
+4:21
+Текущее видео
+
+КУХНЯ АНТИ-ВЕРСИЯ (ПЕРЕОЗВУЧКА) #1
+АНТИ-ВЕРСИЯ
+417 тыс. просмотров
+3 года назад
+
+
+19:49
+Текущее видео
+
+Замок СГОРЕЛ из-за МЕНЯ? GhostBuster Аналитика
+Дима Масленников  
+6,9 млн просмотров
+5 лет назад
+
+
+20:41
+Текущее видео
+
+КОРОЧЕ ГОВОРЯ, ЗАКУПКА ТОВАРА НА 22 000 В МАГНИТЕ | УКРАЛИ ТОВАР В РЕАЛЬНОЙ ЖИЗНИ
+Просрочка Патруль-Нижний Новгород
+5,4 млн просмотров
+5 лет назад
+
+
+40:36
+Текущее видео
+
+Оживляем ThinkPad на Pentium 2
+Дмитрий Бачило
+101 тыс. просмотров
+6 лет назад
+
+
+3:38
+Текущее видео
+
+Массовая забастовка сотрудников Wildberries
+8 канал
+990 тыс. просмотров
+1 год назад
+
+
+13:07
+Текущее видео
+
+СтопХамСПб - Некорректное общение
+СтопХамСПб
+421 тыс. просмотров
+2 года назад
+
+
+8:50
+Текущее видео
+
+запустил гаррисмод на движке half-life 1
+InformanT
+558 тыс. просмотров
+1 год назад
+
+
+1:22
+Текущее видео
+
+Sound reconstruction from human brain activity (Park et al., 2023; S1)
+KamitaniLab
+114 тыс. просмотров
+1 год назад
+
+
+8:19
+Текущее видео
+
+I hacked Raspberry Pi firmware for the World Record Overclock!
+Jeff Geerling
+127 тыс. просмотров
+3 дня назад
+
+
+1:07
+Текущее видео
+
+Lukas Eriksson - "triangle in the club.nsf (NES, Triangle Only)" [Oscilloscope View]
+TakuikaNinja
+68 тыс. просмотров
+4 года назад
+
+
+15:51
+Текущее видео
+
+НАШ САМОЗДРАВ ИЗ ЛЕОМАКС - ТРЕШ, АНАЛОГОВ НЕТ!
+EVG
+161 тыс. просмотров
+1 месяц назад
+
+
+
+Bro is 0 grams 😭
+7,1 млн просмотров
+
+
+Пластилин в Blender урок #blender #tutroial #memes #animation #clay #vibes
+185 тыс. просмотров
+
+
+Secret Rekordbox DJ Hack nobody is using
+157 тыс. просмотров
+
+
+Лелик и старший Лелик ))
+76 тыс. просмотров
+
+
+I Fixed it, Submarine FPV ready to dive into the ocean | The H Lab #shorts
+722 тыс. просмотров
+
+
+🕷️ эту музыку невозможно забыть
+46 тыс. просмотров
+
+
+The power button turns on after 10 minutes.
+951 тыс. просмотров
+
+
+Why Does LEGO Love Making Fun Of Old People?
+1,2 млн просмотров
+
+
+タイムマシンDJ【ブルーハムハム】
+3,7 млн просмотров
+
+
+1:52
+Текущее видео
+
+the only good way to solve chamber 18 in Portal
+PortalGaming
+2,6 тыс. просмотров
+4 дня назад
+
+
+4:50
+Текущее видео
+
+КАК ВЫРАСТИТЬ ******? ЧАСТЬ №4
+kussia
+2,2 млн просмотров
+2 года назад
+
+
+7:30
+Текущее видео
+
+ДА КТО ТАКОЙ ЭТОТ ВАШ ФАНКО ПОП
+sndk
+4,1 млн просмотров
+3 года назад
+
+
+7:44
+Текущее видео
+
+БАТЯ ПОДАРИЛ МАШИНУ! MY SUMMER CAR
+Valera Ghosther
+3,3 млн просмотров
+7 лет назад
+
+
+29:25
+Текущее видео
+
+Урок 27. EEPROM настройки | Часть 1 | Программирование микроконтроллеров AVR
+Программирование микроконтроллеров для начинающих!
+48 тыс. просмотров
+5 лет назад
+
+
+14:45
+Текущее видео
+
+САМЫЕ СТРАННЫЕ ИГРОВЫЕ АКСЕССУАРЫ
+Restart
+854 тыс. просмотров
+5 лет назад
+
+
+
+Новый домик (часть 4) 🏠
+1,3 млн просмотров
+
+
+ЭТО ПОЗОР: Трамп про обмен пленными с Россией
+223 тыс. просмотров
+
+
+FAKE TECH Restoration Videos! 🖥️
+6 млн просмотров
+
+
+Where Did He Come From?!
+1,6 млн просмотров
+
+
+Потертости в Blender #blender #tutorial #memes #animation #material
+322 тыс. просмотров
+
+
+Как понизить температуру такой видеокарты? #пк #игры #гейминг #сборкапк #игровойпк #pc #games
+33 тыс. просмотров
+
+
+These were the best days in gaming #gaming #xbox
+622 тыс. просмотров
+
+
+Соскочил с крючка мошенников
+255 тыс. просмотров
+
+
+Tough question
+20 тыс. просмотров
+
+
+46:08
+Текущее видео
+
+AMAZING VER.2 - HF FULL BAND Modification for Quansheng UV-K5(99)
+OM0ET
+174 тыс. просмотров
+2 месяца назад
+
+
+9:17
+Текущее видео
+
+Подборка мемов по Half Life №1
+Что-то
+16 тыс. просмотров
+12 дней назад
+
+
+13:30
+Текущее видео
+
+Клиент поймал компьютерного мастера на лжи и наказал его
+NOTEBOOKER
+334 тыс. просмотров
+2 года назад
+
+
+9:41
+Текущее видео
+
+ДЕСАНТНИК СТЁПОЧКИН АНТИ-ВЕРСИЯ (ПЕРЕОЗВУЧКА)
+АНТИ-ВЕРСИЯ
+1 млн просмотров
+3 года назад
+
+
+0:35
+Текущее видео
+
+Sonic 3's Snare Sounds Way Better When Slowed Down
+Clownacy
+20 тыс. просмотров
+2 года назад
+
+
+19:12
+Текущее видео
+
+СтопХам UA (Киев) #31
+СтопХам UA
+407 тыс. просмотров
+4 года назад
+
+
+9:04
+Текущее видео
+
+Как я удалял все файлы из Half-Life 2
+ALLAN
+409 тыс. просмотров
+1 год назад
+
+
+27:34
+Текущее видео
+
+Which Linux distribution and GUI to choose ?
+benlinux-en
+4,6 тыс. просмотров
+3 недели назад
+
+
+53:01
+Текущее видео
+
+НОЧЬ в ЗАБРОШЕННОМ ГОРОДЕ с ПРИВИДЕНИЯМИ | GhostBuster
+Дима Масленников  
+11 млн просмотров
+3 года назад
+
+
+15:03
+Текущее видео
+
+Песни, которые звучат СОВЕРШЕННО ОДИНАКОВО #3. A-Ha, Linkin Park, Green Day, Natan
+коваленко трунь
+421 тыс. просмотров
+2 года назад
+
+
+23:02
+Текущее видео
+
+PS3 vs XBOX360: Как IBM продала Microsoft технологии Sony
+Restart
+380 тыс. просмотров
+3 года назад
+
+
+16:01
+Текущее видео
+
+Забавная Dark Hours
+1337LikeR
+375 тыс. просмотров
+6 дней назад
+
+
+0:51
+Текущее видео
+
+Surasshu - Eek! but it's MEOWSynth
+homebrew
+186 тыс. просмотров
+1 год назад
+
+
+9:02
+Текущее видео
+
+МОЖЕТ ЛИ СВЕЧА ОБОГРЕТЬ ДОМ?
+SlivkiShow
+4,5 млн просмотров
+1 год назад
+
+
+11:02
+Текущее видео
+
+ПРОБЛЕМА С ЗАБИВАКОЙ | Разбор Талисманов FIFA
+sndk
+6,4 млн просмотров
+6 лет назад
+
+
+13:39
+Текущее видео
+
+ХОЖУ НЕДЕЛЮ СО СМАРТФОНОМ НА ЭЛЕКТРОННЫХ ЧЕРНИЛАХ! (E-Ink экраном)
+EVG
+283 тыс. просмотров
+2 месяца назад
+
+
+32:47
+Текущее видео
+
+Психопаты из Телеги Пытают ради лайков
+Scammers
+3 млн просмотров
+2 месяца назад
+
+
+7:36
+Текущее видео
+
+PS5 взломана! Релиз Itemzflow. Бекап менеджер для прошивки 3.хх / 4.03/4.50/4.51. Запуск приложении.
+botanIT
+41 тыс. просмотров
+6 месяцев назад
+
+
+4:19
+Текущее видео
+
+ДАВАЙ ПОЖЕНИМСЯ АНТИ-ВЕРСИЯ (ПЕРЕОЗВУЧКА) #4
+АНТИ-ВЕРСИЯ
+215 тыс. просмотров
+4 года назад
+
+
+0:25
+Текущее видео
+
+Why Lua 🥺
+Carrot
+199 тыс. просмотров
+11 месяцев назад
+
+
+20:24
+Текущее видео
+
+Opposing Force 19:23 speedrun
+quadrazid
+4 млн просмотров
+11 лет назад
+
+
+0:46
+Текущее видео
+
+EUWAVE Sound Driver Waveforms Test (FC/NES) [Oscilloscope View]
+Blue Mario
+33 тыс. просмотров
+1 год назад
+
+
+Джем
+Текущее видео
+Джем – КАДЫРОВУ ПОДАРИЛИ СЕГУ (ПОСЛЫШАЛОСЬ)
+Тархун_mz, Юрий Хованский, Джуис Ньютон и другие исполнители
+
+
+Текущее видео
+
+Самая мемная игра будет сыграна
+Uncle Knuckles
+Зрителей: 24
+В ЭФИРЕ
+
+
+
+15:40
+Текущее видео
+
+БЕСПЛАТНОЕ ЭЛЕКТРИЧЕСТВО!
+Доктор Дью
+3,2 млн просмотров
+3 года назад
+
+
+10:32
+Текущее видео
+
+Я точно снял Призрака! - GhostBuster За Гранью... Часть 3
+Дима Масленников  
+6,7 млн просмотров
+7 лет назад
+
+
+0:26
+Текущее видео
+
+square thing [2A03 + VRC6 + MMC5 + N163 + 2C33 + S5B + AY8930 + SAA1099 + POKEY + TIA + SN7 +...
+희민Heemin
+20 тыс. просмотров
+1 год назад
+
+
+48:04
+Текущее видео
+
+Queen | РОК ЖИВ
+Александр Пушной
+2,7 млн просмотров
+1 год назад
+
+
+Джем
+Текущее видео
+Джем – METAL 😜 cover 🤟 на "МАЛЫШАРИКОВ" 🎸
+Александр Пушной и другие исполнители
+
+
+21:31
+Текущее видео
+
+Обзор Raspberry Pi 5 — компьютер за 5000 рублей!
+Rozetked
+903 тыс. просмотров
+5 месяцев назад
+
+
+12:36
+Текущее видео
+
+ИГРА КОТОРУЮ ИСКАЛИ 20 ЛЕТ || ИСТОРИЯ BIO FORCE APE
+Restart
+175 тыс. просмотров
+5 лет назад
+
+
+15:19
+Текущее видео
+
+ЗАБЫТОЕ ПРОДОЛЖЕНИЕ "НУ, ПОГОДИ!"
+sndk
+6,7 млн просмотров
+4 года назад
+
+
+19:25
+Текущее видео
+
+Бешеные продавцы выгоняют покупателя из магазина! / ВЫ НАМ ПОДКИНУЛИ ПРОСРОЧКУ! ДЕТСКИЙ МИР 1 СЕРИЯ
+Просрочка Патруль-Нижний Новгород
+723 тыс. просмотров
+2 года назад
+
+
+14:59
+Текущее видео
+
+СтопХамСПб - Обострение обстановки
+СтопХамСПб
+867 тыс. просмотров
+3 года назад
+
+
+15:51
+Текущее видео
+
+ХУДШИЙ МОД на PORTAL 2 ► Portal: Forbidden Testing Tracks
+STALKEROS VALVE
+57 тыс. просмотров
+1 месяц назад
+
+
+4:05
+Текущее видео
+
+Cold Day
+Macroform Music
+255 тыс. просмотров
+7 лет назад
+
+
+11:07
+Текущее видео
+
+Спасаю Девочку ! (っಠ‿ಠ)っ
+Valera Ghosther
+2,5 млн просмотров
+9 месяцев назад
+
+
+28:35
+Текущее видео
+
+Ночь в Церкви | 24 часа на заброшенном кладбище | GhostBuster
+Дима Масленников  
+4,6 млн просмотров
+7 лет назад
+
+
+15:37
+Текущее видео
+
+КУПИЛ iPad Pro 2024 у БАРЫГ С OZON за 16000₽ ЧТО ПРИШЛО?
+EVG
+265 тыс. просмотров
+2 месяца назад
+
+
+0:31
+Текущее видео
+
+@UserSniper - NES Music Slander | Oscilloscope view
+High Quality Nintendo OSTs
+38 тыс. просмотров
+1 год назад
+
+
+12:55
+Текущее видео
+
+ЧЕЛОВЕК-РАМЕН И ДРУГОЙ СТРАННЫЙ ЯПОНСКИЙ ХАВЧИК | Джанк-Фуд Трип | Сыендук
+sndk
+7,1 млн просмотров
+6 лет назад
+
+
+15:19
+Текущее видео
+
+МастерОК про счетчик убийства жесткого диска. Разбор бреда.
+NOTEBOOKER
+306 тыс. просмотров
+4 года назад
+
+
+12:07
+Текущее видео
+
+Почему iPhone по характеристикам хуже но работает лучше
+stupidmadworld
+10 тыс. просмотров
+1 день назад
+
+
+35:42
+Текущее видео
+
+ИГРА ИЗМЕНИВШАЯ ВСЁ
+Restart
+323 тыс. просмотров
+5 лет назад
+
+
+4:30
+Текущее видео
+
+Bad Apple!! but it's on a 3d Printer (music and video)
+JackLuckSack
+764 тыс. просмотров
+10 месяцев назад
+
+
+1:06:33
+Текущее видео
+
+ТОТ САМЫЙ СТРАШНЫЙ ЛЕС В ЯПОНИИ! ПРОВЕЛ ТАМ НОЧЬ | GhostBuster
+Дима Масленников  
+19 млн просмотров
+1 год назад
+
+
+16:22
+Текущее видео
+
+Зачем сценарий «Короля Льва» несколько раз переписывали
+sndk
+2,7 млн просмотров
+2 года назад
+
+
+1:20
+Текущее видео
+
+Garry's Mod Toolgun Showcase
+Sparks Skywere
+398 тыс. просмотров
+2 года назад
+
+
+Текущее видео
+
+Дальнобойщики 2 💚 111% Дон потерялся
+Don Erondondon
+Зрителей: 17
+В ЭФИРЕ
+
+
+
+18:03
+Текущее видео
+
+Угарный Lethal Company 7
+1337LikeR
+494 тыс. просмотров
+13 дней назад
+
+
+0:20
+Текущее видео
+
+Pac-Man [Oscilloscope view]
+희민Heemin
+22 тыс. просмотров
+1 год назад
+
+
+0:30
+Текущее видео
+
+Linux users explaining
+KoshkoLoL
+1,5 млн просмотров
+3 года назад
+
+
+1:05:20
+Текущее видео
+
+2000 ГОД | Симс, Counter-Strike, Покемоны, PS2, Nokia 3310 | ПОПКУЛЬТ
+sndk
+4,3 млн просмотров
+2 года назад
+
+
+45:29
+Текущее видео
+
+Главные игры поколения PS4/XBOX ONE
+Restart
+329 тыс. просмотров
+3 года назад
+
+
+10:09
+Текущее видео
+
+ШКОЛЬНИК ПЫТАЛСЯ ВЗЛОМАТЬ МОЙ КОМП.. но обоср@лся
+overbafer1
+2,4 млн просмотров
+5 лет назад
+
+
+25:21
+Текущее видео
+
+Я НЕ ВЕРЮ ГЛАЗАМ! ПРИЗРАК РЕАЛЬНО СНЯТ НА ВИДЕО?! GhostBuster
+Дима Масленников  
+7,9 млн просмотров
+1 год назад
+
+
+15:54
+Текущее видео
+
+СтопХамСПб - Дешёвый популизм
+СтопХамСПб
+633 тыс. просмотров
+5 лет назад
+
+
+2:17
+Текущее видео
+
+ОНА ГОТОВА УБИВАТЬ (ПЕРЕОЗВУЧКА)
+sndk
+7,7 млн просмотров
+8 лет назад
+
+
+27:39
+Текущее видео
+
+ОТ MAX PAYNE ДО CONTROL - ФИННЫ ПОКОРИВШИЕ МИР | ИСТОРИЯ REMEDY ENTERTAINMENT
+Restart
+193 тыс. просмотров
+5 лет назад
+
+
+21:02
+Текущее видео
+
+ПОХОРОНИТЕ МЕНЯ ЗА ПЛИНТУСОМ АНТИ-ВЕРСИЯ (ПЕРЕОЗВУЧКА) #4 ФИНАЛ
+АНТИ-ВЕРСИЯ
+450 тыс. просмотров
+4 года назад
+
+
+16:56
+Текущее видео
+
+ЧТО БЫЛО В СМАРТФОНЕ БИЗНЕС-КЛАССА из ТЕЛЕМАГАЗИНА?
+EVG
+305 тыс. просмотров
+8 месяцев назад
+
+
+13:59
+Текущее видео
+
+АТС Орион-1. На тот день, когда телефонные операторы замолчат. Экстренная безлимитная связь.
+Лаборатория MIP-Portal. Техника
+43 тыс. просмотров
+4 года назад
+
+
+18:59
+Текущее видео
+
+ПИОНЕРЫ-ПОПАДАНЦЫ | Советский исекай в анимации
+sndk
+2,2 млн просмотров
+10 месяцев назад
+
+
+2:22:28
+Текущее видео
+
+Критика THE LAST OF US 2 - Горе от ума
+Restart
+1,4 млн просмотров
+3 года назад
+
+
+0:44
+Текущее видео
+
+Underwater Exploration [Sega Genesis Sound Engine]
+reflekshun
+16 тыс. просмотров
+1 год назад
+
+
+0:22
+Текущее видео
+
+Linux from scratch first boot
+Iván Moreno
+4,6 тыс. просмотров
+3 года назад
+
+
+15:51
+Текущее видео
+
+ХАЛЯВЩИКИ с АВИТО покупают мой ПК
+EVG
+329 тыс. просмотров
+1 год назад
+
+
+14:41
+Текущее видео
+
+МЛАДШАЯ ШКОЛА РУССКОГО РЭПА feat. Моргенштерн
+sndk
+13 млн просмотров
+6 лет назад
+
+
+35:37
+Текущее видео
+
+КАК ВЫБРАТЬСЯ ИЗ БЕЗУМНОЙ ПЕЩЕРЫ, НЕ ЗНАЯ ВЫХОДА?
+Дима Масленников  
+5,5 млн просмотров
+5 лет назад
+
+
+14:30
+Текущее видео
+
+СтопХам - Семейное Обострение. Часть 1
+СтопХам
+5,4 млн просмотров
+6 лет назад
+
+
+11:12
+Текущее видео
+
+6 ПОДЕЛИЙ ОТ ВЕСЕЛЫХ ИЗОБРЕТУНОВ И ОДИН ГРУСТНЫЙ ДАВИД
+Доктор Дью
+2,9 млн просмотров
+3 года назад
+
+
+19:14
+Текущее видео
+
+ЭТО НАШ РОССИЙСКИЙ IPhone! ИМПОРТОЗАМЕЩЕНИЕ ответ Н.А.Т.О.
+EVG
+422 тыс. просмотров
+1 год назад
+
+
+6:09
+Текущее видео
+
+НОВЫЕ ТРИ БОГАТЫРЯ | Сыендук
+sndk
+14 млн просмотров
+6 лет назад
+
+
+16:03
+Текущее видео
+
+Он УНИЧТОЖАЕТ мой Garry's Mod! | Разбор Gmod Weird Models [gmod arg]
+RG Studio
+528 тыс. просмотров
+4 месяца назад
+
+
+7:59
+Текущее видео
+
+СЛЕПАЯ В ТЮРЬМЕ АНТИ-ВЕРСИЯ (ПЕРЕОЗВУЧКА)
+АНТИ-ВЕРСИЯ
+638 тыс. просмотров
+3 года назад
+
+
+12:26
+Текущее видео
+
+ЧТО МОЖНО ИЗОБРЕСТИ ПОД ГРИБАМИ
+Доктор Дью
+3 млн просмотров
+3 года назад
+
+
+17:39
+Текущее видео
+
+ПРОНИКАЮ НА РАБОТУ В ТЕЛЕМАГАЗИН - Анкеты и Собеседование в ЛЕОМАКС
+EVG
+274 тыс. просмотров
+5 месяцев назад
+
+
+5:16
+Текущее видео
+
+GTA 6 — ПЕРВЫЙ ВЗГЛЯД
+sndk
+16 млн просмотров
+7 лет назад
+
+
+28:16
+Текущее видео
+
+СтопХамСПб - Кража телефона / Phone theft (english subtitles)
+СтопХамСПб
+686 тыс. просмотров
+2 года назад
+
+
+25:39
+Текущее видео
+
+ПРОНИКЛИ в ЯДЕРНЫЙ РЕАКТОР + ЗАБРОШЕННЫЙ БУНКЕР - Сталкеры
+Дима Масленников  
+8,2 млн просмотров
+3 года назад
+
+
+25:17
+Текущее видео
+
+САМАЯ ВАЖНАЯ ФУНКЦИЯ КОНСОЛИ, КОТОРОЙ НИКТО НЕ ПОЛЬЗУЕТСЯ
+Restart
+353 тыс. просмотров
+4 года назад
+
+
+24:27
+Текущее видео
+
+✅ПРОНИК в ЛОГОВО СЕКТАНТОВ и ПОПАЛ в ЛОВУШКУ
+EVG
+479 тыс. просмотров
+3 года назад
+
+
+10:30
+Текущее видео
+
+ВИДОС ПРО КОРОБКИ ОТ ХЛОПЬЕВ | sndk
+sndk
+4,7 млн просмотров
+3 года назад
+
+
+9:36
+Текущее видео
+
+БЕРЕМЕННА В 16. РОССИЯ АНТИ-ВЕРСИЯ (ПЕРЕОЗВУЧКА) #9
+АНТИ-ВЕРСИЯ
+435 тыс. просмотров
+3 года назад
+
+
+6:36
+Текущее видео
+
+СИМУЛЯТОР ВЫШИБАЛЫ ДОЛГОВ | Гейммастерс
+sndk
+10 млн просмотров
+5 лет назад
+
+
+4:56
+Текущее видео
+
+ФИКСИКИ СУЩЕСТВУЮТ | Сыендук
+sndk
+17 млн просмотров
+10 лет назад
+
+
+6:06
+Текущее видео
+
+УБОГИЕ GTA-КЛОНЫ | Мобильный Передоз
+sndk
+16 млн просмотров
+8 лет назад
+
+
+10:29
+Текущее видео
+
+САМЫЕ СТРАННЫЕ ВЫМЫШЛЕННЫЕ НАПИТКИ | Сыендук
+sndk
+11 млн просмотров
+6 лет назад
+
+
+28:17
+Текущее видео
+
+НОЧЬ в доме с Паранормальными явлениями - GhostBuster | Охотник за привидениями
+Дима Масленников  
+7,4 млн просмотров
+7 лет назад
+
+
+10:19
+Текущее видео
+
+САМАЯ СТРАННАЯ ВЫМЫШЛЕННАЯ ЕДА | Сыендук
+sndk
+11 млн просмотров
+6 лет назад
+
+
+9:03
+Текущее видео
+
+НА НОЖАХ АНТИ-ВЕРСИЯ (ПЕРЕОЗВУЧКА)
+АНТИ-ВЕРСИЯ
+352 тыс. просмотров
+3 года назад
+
+
+4:11
+Текущее видео
+
+БАРБОСКИНЫ: ФУТБОЛЬНОЕ БЕШЕНСТВО | Сыендук
+sndk
+29 млн просмотров
+8 лет назад
+
+
+1:44:39
+Текущее видео
+
+2006 ГОД | Тачки, Счастливы вместе, Garry's Mod, Борат, Roblox, PS3, Wii | Попкульт
+sndk
+3,3 млн просмотров
+1 год назад
+
+
+11:33
+Текущее видео
+
+ЧТО СТАЛО С M&M's? | Разбор говорящих конфет
+sndk
+1,7 млн просмотров
+7 месяцев назад
+
+
+5:16
+Текущее видео
+
+ЧЕТВЁРТЫЙ БОГАТЫРЬ
+sndk
+7,9 млн просмотров
+4 года назад
+
+
+43:54
+Текущее видео
+
+Ночь в ЗАМКЕ с реальными Привидениями? | Самый Страшный замок Мира GhostBuster
+Дима Масленников  
+11 млн просмотров
+7 лет назад
+
+
+8:06
+Текущее видео
+
+КРИВЫЕ АНАЛОГИ НЕСКВИКА
+sndk
+7,7 млн просмотров
+4 года назад
+
+
+9:26
+Текущее видео
+
+БЕРЕМЕННА В 16 АНТИ-ВЕРСИЯ (ПЕРЕОЗВУЧКА) #10
+АНТИ-ВЕРСИЯ
+284 тыс. просмотров
+1 год назад
+
+
+1:54:50
+Текущее видео
+
+2001 ГОД | Шрек, GTA3, Bratz, Max Payne, Масяня, Клиника | ПОПКУЛЬТ
+sndk
+5,5 млн просмотров
+2 года назад
+
+
+1:35:53
+Текущее видео
+
+2004 ГОД | PSP, San Andreas, Смешарики, Jetix, Half-Life 2 | ПОПКУЛЬТ
+sndk
+3,7 млн просмотров
+1 год назад
+
+
+1:49:31
+Текущее видео
+
+2010 ГОД | Время Приключений, Начало, Шерлок, Heavy Rain, Реутов ТВ | Попкульт
+sndk
+2,9 млн просмотров
+1 год назад
+
+
+4:36
+Текущее видео
+
+СВИНКА ПЕППА И СКАНДАЛЫ | Сыендук
+sndk
+17 млн просмотров
+8 лет назад
+
+
+37:58
+Текущее видео
+
+ИСПЫТАЛ СОННЫЙ ПАРАЛИЧ на СЕБЕ! Страшный ЭКСПЕРИМЕНТ
+Дима Масленников  
+14 млн просмотров
+3 года назад
+
+
+13:53
+Текущее видео
+
+ЖВАЧКА ТВОЕГО ДЕТСТВА | Трогательная история жевательной резинки в России | sndk
+sndk
+7,1 млн просмотров
+4 года назад
+
+
+53:21
+Текущее видео
+
+Самая амбициозная афера Sony! || Playstation VR
+Restart
+428 тыс. просмотров
+3 года назад
+
+
+13:33
+Текущее видео
+
+САМЫЕ СТРЁМНЫЕ МАСКОТЫ ФАСТ-ФУДА | sndk
+sndk
+11 млн просмотров
+6 лет назад
+
+
+7:12
+Текущее видео
+
+УРОКИ ****ЫХ МАНЕР | Карусель Безумия | Сыендук
+sndk
+27 млн просмотров
+8 лет назад
+
+
+1:34:36
+Текущее видео
+
+2003 ГОД | Need for Speed Underground, Пираты, Немо, TMNT, Как достать соседа | ПОПКУЛЬТ
+sndk
+3,5 млн просмотров
+1 год назад
+
+
+10:35
+Текущее видео
+
+ПОТЕРЯННЫЙ МУЛЬТ ПРО КАРЛСОНА
+sndk
+4,7 млн просмотров
+1 год назад
+
+
+18:29
+Текущее видео
+
+✅ПОЛЬЗУЮСЬ НЕДЕЛЮ ТОЛЬКО ТОВАРАМИ ИЗ ТЕЛЕМАГАЗИНА
+EVG
+920 тыс. просмотров
+3 года назад
+
+
+1:39:49
+Текущее видео
+
+2005 ГОД | Мадагаскар, God of War, Guitar Hero, Xbox 360, Офис | ПОПКУЛЬТ
+sndk
+3 млн просмотров
+1 год назад
+
+
+1:14:36
+Текущее видео
+
+Xbox Original - Наследник Dreamcast
+Restart
+2,5 млн просмотров
+2 года назад
+
+
+1:33:41
+Текущее видео
+
+2002 ГОД | Наруто, WarCraft 3, Vice City, Ледниковый Период, Лило и Стич | ПОПКУЛЬТ
+sndk
+3,3 млн просмотров
+2 года назад
+
+
+1:55:44
+Текущее видео
+
+1990 ГОД | Деньги в банках колы, Макдоналдс в СССР, Супер Нинтендо в Японии | Попкульт
+sndk
+2,1 млн просмотров
+3 месяца назад
+
+
+14:32
+Текущее видео
+
+Шрек из книги против Шрека из мультфильма
+sndk
+2,8 млн просмотров
+1 год назад
+
+
+14:23
+Текущее видео
+
+ПОХОРОНЕННЫЕ МУЛЬТЫ ДИСНЕЙ
+sndk
+3,4 млн просмотров
+2 года назад
+
+
+23:37
+Текущее видео
+
+✅СМАРТФОН ОТ СПЕЦСЛУЖБ ИЗ ТЕЛЕМАГАЗИНА / Ожидание и Реальность
+EVG
+1,4 млн просмотров
+2 года назад
+
+
+12:25
+Текущее видео
+
+МАСКОТЫ ИЗ РОССИИ | Разбор рекламных персонажей 2000-х | Сыендук
+sndk
+7,4 млн просмотров
+5 лет назад
+
+
+26:11
+Текущее видео
+
+Безумные консоли из 90ых
+Restart
+850 тыс. просмотров
+3 года назад
+
+
+13:12
+Текущее видео
+
+СМЕРТЕЛЬНЫЙ КОКТЕЙЛЬ ИЗ МАКДАКА | Гримас и забытые персонажи Макдоналдс
+sndk
+2,7 млн просмотров
+1 год назад
+
+9:22
+Текущее видео
+
+УПОРОТЫЕ МУЛЬТЫ О БЕЗОПАСНОСТИ | Сыендук
+sndk
+14 млн просмотров
+6 лет назад
+
+10:05
+Текущее видео
+
+СПОКОЙНОЙ НОЧИ, М*****! | Карусель Безумия | Сыендук
+sndk
+18 млн просмотров
+7 лет назад
+
+12:33
+Текущее видео
+
+Удивительная история семечек
+sndk
+3 млн просмотров
+1 год назад
+
+30:38
+Текущее видео
+
+✅Купил МИСТЕРИ БОКС с iPhone, но они ПРИСЛАЛИ ЭТО!
+EVG
+657 тыс. просмотров
+1 год назад
+
+1:26:49
+Текущее видео
+
+1991 ГОД | Соник, Чёрный Плащ, Терминатор 2, Рен и Стимпи | Попкульт
+sndk
+1,1 млн просмотров
+1 месяц назад
+
+25:32
+Текущее видео
+
+Sony делает эмулятор PS3 || Metroid Prime 4 для Switch 2 || Игроки не справились с DLC к Elden Ring
+Restart
+125 тыс. просмотров
+1 месяц назад
+
+1:25:33
+Текущее видео
+
+2000-2009: НЕВОШЕДШЕЕ | Американский психопат, Worms 3D, Тушите свет, Pucca, Sam & Max | Попкульт
+sndk
+2 млн просмотров
+1 год назад
+
+19:57
+Текущее видео
+
+Как клоуны стали символом ужасов | Эволюция образа в массовой культуре
+sndk
+2 млн просмотров
+9 месяцев назад
+
+13:32
+Текущее видео
+
+Странные советские мульты про семью | Только для взрослых, Большие неприятности, Его жена курица
+sndk
+1,8 млн просмотров
+7 месяцев назад
+
+1:24:06
+Текущее видео
+
+2008 ГОД | Железный Человек, Тёмный Рыцарь, Ранетки, Во все тяжкие, Валл-И, Кунг-фу Панда | ПОПКУЛЬТ
+sndk
+2,9 млн просмотров
+1 год назад
+
+27:33
+Текущее видео
+
+✅ТИПОК ХОДИТ С МОИМ ТЕЛЕФОНОМ / СЛЕЖУ ЗА НИМ
+EVG
+704 тыс. просмотров
+3 года назад
+
+24:26
+Текущее видео
+
+Мультивселенная «Острова сокровищ»
+sndk
+3,1 млн просмотров
+1 год назад
+
+45:32
+Текущее видео
+
+ОДИН НА ЗАБРОШЕННОМ КОРАБЛЕ ПРИЗРАКЕ! НОЧЬ в стиле GHOSTBUSTER
+Дима Масленников  
+8 млн просмотров
+2 года назад
+
+4:39
+Текущее видео
+
+В КУПАЛЬНИКЕ ПО МОРОЗУ | Мобильный Передоз
+sndk
+13 млн просмотров
+8 лет назад
+
+10:57
+Текущее видео
+
+ИСТОРИЯ ДОШИРАКА | Лапшичное Безумие | Сыендук
+sndk
+7,6 млн просмотров
+4 года назад
+
+17:27
+Текущее видео
+
+НЕЗНАЙКА — ЭКСТРЕМИСТ? | Разбор Мультфильма "Незнайка на Луне" | Сыендук
+sndk
+15 млн просмотров
+7 лет назад
+
+10:07
+Текущее видео
+
+МЧС: СПАСИ И СОХРАНИ | Спасик: Разбор Мультфильма | Сыендук
+sndk
+13 млн просмотров
+6 лет назад
+
+7:23
+Текущее видео
+
+МАЙКЛ ДЖЕКСОН ЖИВ? (GTA: ПИРАТСКИЙ ПЕРЕДОЗ #2)
+sndk
+7,2 млн просмотров
+9 лет назад
+
+19:26
+Текущее видео
+
+БРЕМЕНСКИЕ МУЗЫКАНТЫ: РАЗБОР ТРИЛОГИИ | Сыендук
+sndk
+14 млн просмотров
+7 лет назад
+
+5:00
+Текущее видео
+
+НАРУТО В SAN ANDREAS (GTA: ПИРАТСКИЙ ПЕРЕДОЗ #1)
+sndk
+12 млн просмотров
+9 лет назад
