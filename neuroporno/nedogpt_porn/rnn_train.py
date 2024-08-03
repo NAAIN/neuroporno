@@ -6,7 +6,7 @@ embed_size = 128
 hidden_size = 128
 num_layers = 12
 #^^^^^^^^^^^^^^^^настройки НОВОЙ обучаемой модели(если доучивать то эти крутилки не учитываются)
-batch_size = 100000
+batch_size = 10000
 learn_rate = 0.00001
 num_epochs = 12000
 datasetFile = "resources/gopota_files/dset.txt"
@@ -14,7 +14,7 @@ ExistsModelPthName = ""
 #ExistsModelPthName = "models/RNN/RNN_degenerat_начал_чота_понимать.pth" #закомментируй чтобы создать новую модель
 LearnedPthName = "neuroporno/models/RNN/RNN_degenerat.pth"
 start_str = "жопа"
-debug_in_name = True #Добавляет колво эпох, learn rate и параметры слоёв в название файла
+debug_in_name = True #Добавляет колво эпох, learn rate и время в название файла
 early_stop = False
 shuffle = True
 early_stopping_patience = 10
@@ -116,7 +116,7 @@ def generate_text(model, start_str, length=100):
 
 if debug_in_name: 
     import time
-    LearnedPthName += f"{epoch}_{learn_rate}_{embed_size}_{hidden_size}_{num_layers}_{time.time}"
+    LearnedPthName += f"{epoch}_{learn_rate}_{embed_size}_{hidden_size}_{num_layers}_{time.time()}"
 
 torch.save({
     'model_state_dict': model.state_dict(),
@@ -128,4 +128,4 @@ torch.save({
     "num_layers": num_layers,
 }, LearnedPthName)
 
-print(generate_text(model, 'Привет, ЛУКОЙЛ??', 100))
+print(generate_text(model,start_str, 100))

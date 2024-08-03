@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-model_file = "neuroporno/models/RNN/RNN_degenerat.pth0_1e-05_128_128_12"
+model_file = "neuroporno/models/RNN/RNN_degenerat.pth1_1e-05_128_128_12_1722726791.0643623"
 length=100
 
 class CharRNN(nn.Module):
