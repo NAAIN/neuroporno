@@ -6,16 +6,17 @@ embed_size = 128
 hidden_size = 128
 num_layers = 12
 #^^^^^^^^^^^^^^^^настройки НОВОЙ обучаемой модели(если доучивать то эти крутилки не учитываются)
-batch_size = 1000
+batch_size = 100000
 learn_rate = 0.00001
 num_epochs = 12000
-datasetFile = "resources/dset.txt"
+datasetFile = "resources/gopota_files/dset.txt"
 ExistsModelPthName = ""
-#ExistsModelPthName = "models/GRU_degenerat_начал_чота_понимать.pth" #закомментируй чтобы создать новую модель
-LearnedPthName = "models/RNN_degenerat.pth"
+#ExistsModelPthName = "models/RNN/RNN_degenerat_начал_чота_понимать.pth" #закомментируй чтобы создать новую модель
+LearnedPthName = "neuroporno/models/RNN/RNN_degenerat.pth"
 start_str = "жопа"
 debug_in_name = True #Добавляет колво эпох, learn rate и параметры слоёв в название файла
 early_stop = False
+shuffle = True
 early_stopping_patience = 10
 early_stopping_counter = 0
 early_stopping_factor = 0.1
@@ -37,7 +38,7 @@ class TextDataset(Dataset):
         return torch.tensor(self.data[idx], dtype=torch.long), torch.tensor(self.data[idx + 1], dtype=torch.long)
 
 dataset = TextDataset(datasetFile)
-dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
+dataloader = DataLoader(dataset, batch_size,shuffle)
 
 import torch.nn as nn
 
@@ -51,7 +52,7 @@ class CharRNN(nn.Module):
     def forward(self, x):
         x = self.embedding(x)
         out, _ = self.rnn(x)
-        out = self.fc(out[:, -1, :])  # Используем последний временной шаг
+        out = self.fc(out[:, -1, :])
         return out
 
 if os.path.isfile(ExistsModelPthName):
@@ -60,9 +61,7 @@ if os.path.isfile(ExistsModelPthName):
     current_vocab_size = len(dataset.chars)
     if current_vocab_size != saved_vocab_size:
         print(f"Размер словаря изменился с {saved_vocab_size} на {current_vocab_size}.")
-        # Создаем новую модель с текущим размером словаря
         model = CharRNN(vocab_size=current_vocab_size, embed_size=embed_size, hidden_size=hidden_size, num_layers=num_layers)
-        # Загружаем параметры, которые совпадают по размеру
         state_dict = checkpoint['model_state_dict']
         model_state_dict = model.state_dict()
         
@@ -115,7 +114,9 @@ def generate_text(model, start_str, length=100):
     
     return ''.join(chars)
 
-if debug_in_name: LearnedPthName += f"{epoch}_{learn_rate}_{embed_size}_{hidden_size}_{num_layers}"
+if debug_in_name: 
+    import time
+    LearnedPthName += f"{epoch}_{learn_rate}_{embed_size}_{hidden_size}_{num_layers}_{time.time}"
 
 torch.save({
     'model_state_dict': model.state_dict(),

@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-model_file = "models/RNN_degenerat.pth0_1e-05_128_128_12"
+model_file = "neuroporno/models/RNN/RNN_degenerat.pth0_1e-05_128_128_12"
 length=100
 
 class CharRNN(nn.Module):
@@ -14,9 +14,7 @@ class CharRNN(nn.Module):
     def forward(self, x):
         x = self.embedding(x)
         out, _ = self.rnn(x)
-        # Проверяем размерности
-        #print("RNN output shape:", out.shape)
-        out = self.fc(out[:, -1, :])  # Используем последний временной шаг
+        out = self.fc(out[:, -1, :])
         return out
 
 vocab_size = 1
@@ -49,6 +47,6 @@ try:
             generated_text = generate_text(model, start_str, length)
             print(generated_text)
         except KeyError as e:
-            print(f"молодой чоловек тут как бы {e}")
+            print(f"молодой чоловек тут как бы KeyError")
 except KeyboardInterrupt:
     exit("ну ладно")
