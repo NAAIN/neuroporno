@@ -15,7 +15,7 @@ num_epochs = 12000
 datasetFile = "resources/gopota_files/dset.txt"
 ExistsModelPthName = ""
 #ExistsModelPthName = "models/GRU_degenerat_начал_чота_понимать.pth" #закомментируй чтобы создать новую модель
-LearnedPthName = "neuroporno/models/GRU_degenerat.pth"
+LearnedPthName = "neuroporno/models/GRU/GRU_degenerat.pth"
 start_str = "жопа"
 debug_in_name = True #Добавляет колво эпох, learn rate и параметры слоёв в название файла
 early_stop = False
@@ -155,8 +155,10 @@ try:
 except KeyboardInterrupt:
     print("\nне трогайте сука9(9((")
     
-if debug_in_name: LearnedPthName += f"{epoch}_{learn_rate}_{embed_size}_{hidden_size}_{num_layers}"
-
+if debug_in_name: 
+    import time
+    LearnedPthName += f"{epoch}_{learn_rate}_{embed_size}_{hidden_size}_{num_layers}_{time.time()}"
+    
 torch.save({
     'model_state_dict': model.state_dict(),
     'char_to_idx': char_to_idx,

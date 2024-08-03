@@ -3,7 +3,7 @@ import torch.nn as nn
 import numpy as np
 import os
 
-model_file = "models/GRU_degenerat_12000_1e-05.pth"
+model_file = "neuroporno/models/GRU/GRU_degenerat_12000_1e-05.pth"
 length=100
 temperature=2
 top_k=100

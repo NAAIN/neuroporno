@@ -12,11 +12,12 @@ num_layers = 12
 batch_size = 1000
 learn_rate = 0.0001
 num_epochs = 1200
-datasetFile = "resources/dset.txt"
+datasetFile = "resources/gopota_files/dset.txt"
 ExistsModelPthName = ""
-ExistsModelPthName = "models/LSTM_degenerat0.pth" #закомментируй чтобы создать новую модель
-LearnedPthName = "models/LSTM_degenerat.pth"
+#ExistsModelPthName = "neuroporno/models/LSTM/LSTM_degenerat0.pth" #закомментируй чтобы создать новую модель
+LearnedPthName = "neuroporno/models/LSTM/LSTM_degenerat.pth"
 start_str = "жопа"
+debug_in_name = True 
 #^^^^^^^^^^^^^^^^^^^^^^^^^^ 
 # Код ниже лучше не трогать (говнокод warning)
 
@@ -123,6 +124,10 @@ try:
         print(f'Epoch {epoch+1}/{num_epochs}, Loss: {loss.item()}')
 except KeyboardInterrupt:
     print("не трогайте сука9(9((")
+
+if debug_in_name: 
+    import time
+    LearnedPthName += f"{epoch}_{learn_rate}_{embed_size}_{hidden_size}_{num_layers}_{time.time()}"
 
 torch.save({
     'model_state_dict': model.state_dict(),

@@ -3,7 +3,7 @@ import torch.nn as nn
 import numpy as np
 import os
 
-LearnedPthName = "models/LSTM_degenerat.pth"
+LearnedPthName = "neuroporno/models/LSTM/LSTM_degenerat.pth"
 vocab_size = 0
 class CharLSTM(nn.Module):
     def __init__(self, vocab_size, embed_size, hidden_size, num_layers):
