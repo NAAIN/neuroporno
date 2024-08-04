@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-model_file = "neuroporno/models/RNN/RNN_degenerat.pth1_1e-05_128_128_12_1722726791.0643623"
+model_file = "neuroporno/models/LSTM/LSTM_degenerat.pth6_0.0001_128_128_12_1722751339.2929528"
 length=100
 
 class CharRNN(nn.Module):
@@ -19,7 +19,7 @@ class CharRNN(nn.Module):
 
 vocab_size = 1
 asel = torch.load(model_file)
-model = CharRNN(vocab_size=asel["vocab_size"], embed_size=asel["embed_size"], hidden_size=asel["hidden_size"], num_layers=asel["num_layers"])
+model = CharRNN(vocab_size=asel["vocab_size"], embed_size=asel["emded_size"], hidden_size=asel["hidden_size"], num_layers=asel["num_layers"])
 model.eval()
 
 def generate_text(model, start_str, length):

@@ -18,7 +18,7 @@ class CharLSTM(nn.Module):
         out = self.fc(out[:, -1, :])
         return out
 
-def generate_text(model, start_str, char_to_idx, idx_to_char, length=100, temperature=1.0, top_k=5):
+def generate_text(model, start_str, char_to_idx, idx_to_char, length=100, temperature=0.5, top_k=60):
     model.eval()
     chars = list(start_str)
     input_seq = torch.tensor([char_to_idx.get(c, 0) for c in start_str], dtype=torch.long).unsqueeze(0)
@@ -42,7 +42,7 @@ if os.path.isfile(LearnedPthName):
     saved_vocab_size = checkpoint['vocab_size']
     char_to_idx = checkpoint['char_to_idx']
     idx_to_char = checkpoint['idx_to_char']
-    embed_size = checkpoint['emded_size']
+    embed_size = checkpoint['embed_size']
     hidden_size = checkpoint['hidden_size']
     num_layers = checkpoint['num_layers']
     model = CharLSTM(vocab_size, embed_size, hidden_size, num_layers)

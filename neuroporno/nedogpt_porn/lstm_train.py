@@ -14,10 +14,10 @@ learn_rate = 0.0001
 num_epochs = 1200
 datasetFile = "resources/gopota_files/dset.txt"
 ExistsModelPthName = ""
-#ExistsModelPthName = "neuroporno/models/LSTM/LSTM_degenerat0.pth" #закомментируй чтобы создать новую модель
+ExistsModelPthName = "neuroporno/models/LSTM/LSTM_degenerat.pth6_0.0001_128_128_12_1722751339.2929528" #закомментируй чтобы создать новую модель
 LearnedPthName = "neuroporno/models/LSTM/LSTM_degenerat.pth"
 start_str = "жопа"
-debug_in_name = True 
+debug_in_name = False
 #^^^^^^^^^^^^^^^^^^^^^^^^^^ 
 # Код ниже лучше не трогать (говнокод warning)
 
@@ -82,7 +82,7 @@ model = CharLSTM(vocab_size, embed_size, hidden_size, num_layers)
 if os.path.isfile(ExistsModelPthName):
     checkpoint = torch.load(ExistsModelPthName)
     saved_vocab_size = checkpoint['vocab_size']
-    embed_size=checkpoint['embed_size']
+    embed_size=checkpoint['emded_size']
     hidden_size=checkpoint['hidden_size']
     num_layers=checkpoint['num_layers']
     char_to_idx = checkpoint['char_to_idx']
@@ -133,11 +133,14 @@ torch.save({
     'model_state_dict': model.state_dict(),
     'char_to_idx': char_to_idx,
     'idx_to_char': idx_to_char,
-    'vocab_size': vocab_size,
-    "emded_size":embed_size,
+    'vocab_size': vocab_size, 
+    "embed_size":embed_size,
     "hidden_size":hidden_size,
     "num_layers":num_layers,
 }, LearnedPthName)
 
-generated_text = generate_text(model, start_str, char_to_idx, idx_to_char, length=100, temperature=0.8, top_k=5)
-print(generated_text)
+try:
+    generated_text = generate_text(model, start_str, char_to_idx, idx_to_char, length=100, temperature=0.8, top_k=5)
+    print(generated_text)
+except IndexError:
+    print("да")
