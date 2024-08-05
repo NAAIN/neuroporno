@@ -12,10 +12,10 @@ num_layers = 12
 batch_size = 1000
 learn_rate = 0.0001
 num_epochs = 1200
-datasetFile = "resources/gopota_files/dset.txt"
+datasetFile = "resources/gopota_files/gopota_dataset/dset.txt"
 ExistsModelPthName = ""
-ExistsModelPthName = "neuroporno/models/LSTM/LSTM_degenerat.pth6_0.0001_128_128_12_1722751339.2929528" #закомментируй чтобы создать новую модель
-LearnedPthName = "neuroporno/models/LSTM/LSTM_degenerat.pth"
+ExistsModelPthName = "resources/gopota_files/models/LSTM/LSTM_degenerat.pth6_0.0001_128_128_12_1722751339.2929528" #закомментируй чтобы создать новую модель
+LearnedPthName = "resources/gopota_files/models/LSTM/LSTM_degenerat.pth"
 start_str = "жопа"
 debug_in_name = False
 #^^^^^^^^^^^^^^^^^^^^^^^^^^ 

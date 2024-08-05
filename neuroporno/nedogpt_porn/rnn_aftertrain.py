@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-model_file = "neuroporno/models/LSTM/LSTM_degenerat.pth6_0.0001_128_128_12_1722751339.2929528"
+model_file = "resources/gopota_files/models/LSTM/LSTM_degenerat.pth6_0.0001_128_128_12_1722751339.2929528"
 length=100
 
 class CharRNN(nn.Module):

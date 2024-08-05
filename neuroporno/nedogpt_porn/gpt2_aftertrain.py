@@ -3,8 +3,8 @@ import numpy as np
 from transformers import GPT2LMHeadModel, GPT2Tokenizer
 
 # Загрузите модель и токенизатор
-model = GPT2LMHeadModel.from_pretrained('./models/gopota')
-tokenizer = GPT2Tokenizer.from_pretrained('./models/gopota')
+model = GPT2LMHeadModel.from_pretrained('resources/gopota_files/models/gopota')
+tokenizer = GPT2Tokenizer.from_pretrained('resources/gopota_files/models/gopota')
 
 import torch
 

@@ -14,7 +14,7 @@ if tokenizer.pad_token is None:
     tokenizer.pad_token = tokenizer.eos_token
 
 # Загрузите датасет
-dataset = load_dataset('text', data_files={'train': 'dset.txt'})
+dataset = load_dataset('text', data_files={'train': 'resources/gopota_files/gopota_dataset/dset.txt'})
 
 # Токенизируем данные
 def tokenize_function(examples):
@@ -81,5 +81,5 @@ except KeyboardInterrupt:
     print("не трогайте сука9(9((")
     
 # Сохранение модели
-model.save_pretrained('./models/gopota')
-tokenizer.save_pretrained('./models/gopota')
+model.save_pretrained('resources/gopota_files/models/gopota')
+tokenizer.save_pretrained('resources/gopota_files/models/gopota')
