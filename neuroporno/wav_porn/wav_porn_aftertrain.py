@@ -11,7 +11,7 @@ output = []
 
 start_time = time.time()
 
-orig_rate,orig = wavfile.read("resources/orig.wav")
+orig_rate,orig = wavfile.read("resources/wav_porn_files/orig.wav")
 if orig.ndim == 2:
     print("Warning, Original file is Stereo. converting to mono..")
     audio_data = np.mean(orig, axis=1).astype(orig.dtype)
@@ -36,7 +36,7 @@ class SimpleNet(nn.Module):
         x = self.linear11(x)
         return self.linear2(x)
 
-SimpleNet = torch.load("models/wav_degenerat.pth")
+SimpleNet = torch.load("resources/wav_porn_files/models/wav_degenerat.pth")
 try:
     for i in range(len(audio_data)):
         #iterateR = i / 10000000
@@ -59,4 +59,4 @@ while np.max(np.abs(output)) > 0.85:
     print(f"Max sample volume is {np.max(np.abs(output))}", end='\r')
 
 
-wavfile.write(f"resources/wav_porn_out.wav",orig_rate,np.array(output))
+wavfile.write(f"resources/wav_porn_files/wav2wav(?)_out.wav",orig_rate,np.array(output))

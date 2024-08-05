@@ -9,10 +9,10 @@ import os
 batch_size = 1 #лучше по одной, хоть модель поумнее будет (наверн)
 learn_rate = 0.001
 num_epochs = 1200
-datasetDir = "resources/img2img_dataset/"
+datasetDir = "resources/img2img_files/img2img_dataset/"
 ExistsModelPthName = ""
-#ExistsModelPthName = "models/img2img_degenerat.pth" #закомментируй чтобы создать новую модель
-LearnedPthName = "models/img2img_degenerat.pth"
+#ExistsModelPthName = "img2img_files/models/img2img_degenerat.pth"" #закомментируй чтобы создать новую модель
+LearnedPthName = "img2img_files/models/img2img_degenerat.pth"
 debug_in_name = True
 Shuffle = True
 #^^^^^^^^^^^^^^^^^^^^^^^^^^ 

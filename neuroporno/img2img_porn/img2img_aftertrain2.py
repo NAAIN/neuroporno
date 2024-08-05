@@ -23,14 +23,14 @@ class Autoencoder(nn.Module):
         return x
 
 model = Autoencoder()
-model = torch.load('models/img2img_degenerat.pth')
+model = torch.load('resources/img2img_files/models/img2img_degenerat.pth')
 
 transform = transforms.Compose([
     #transforms.Resize((1024, 1024)),
     transforms.ToTensor(),
 ])
 
-image = Image.open('resources/a.png').convert("RGB")
+image = Image.open('resources/img2img_files/a.png').convert("RGB")
 image = transform(image)
 image = image.unsqueeze(0)
 
@@ -39,4 +39,4 @@ with torch.no_grad():
 
 output_image = output.squeeze(0)
 output_image = transforms.ToPILImage()(output_image)
-output_image.save('resources/a_out.png')
+output_image.save('resources/img2img_files/a_out.png')

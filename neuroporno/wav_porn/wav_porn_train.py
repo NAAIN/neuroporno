@@ -13,7 +13,7 @@ output = []
 
 start_time = time.time()
 
-orig_rate,orig = wavfile.read("resources/orig.wav")
+orig_rate,orig = wavfile.read("resources/wav_porn_files/orig.wav")
 if orig.ndim == 2:
     print("Warning, Original file is Stereo. converting to mono..")
     audio_data = np.mean(orig, axis=1).astype(orig.dtype)
@@ -63,4 +63,4 @@ test_x = torch.tensor([float(audio_data[epoch]),iterateR], dtype=torch.float32)
 y = model(test_x)
 print(test_x)
 print(y)
-torch.save(model, "models/wav_degenerat.pth")
+torch.save(model, "resources/wav_porn_files/models/wav_degenerat.pth")

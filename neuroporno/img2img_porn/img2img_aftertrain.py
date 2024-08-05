@@ -3,9 +3,9 @@ import torch.nn as nn
 from torchvision import transforms
 from PIL import Image
 
-inputImage = "resources/a.png"
-outputImage = "resources/a_out.png"
-modelFile = "models/img2img_degenerat.pth"
+inputImage = "resources/img2img_files/a.png"
+outputImage = "resources/img2img_files/a_out.png"
+modelFile = "resources/img2img_files/models/img2img_degenerat.pth"
 class Autoencoder(nn.Module):
     def __init__(self):
         super(Autoencoder, self).__init__()
@@ -36,14 +36,12 @@ transform = transforms.Compose([
     transforms.ToTensor(),
 ])
 
-# Загрузка и преобразование изображения
 image = Image.open(inputImage).convert("RGB")
 image = transform(image)
 image = image.unsqueeze(0)
 
 with torch.no_grad(): output = model(image)
 
-# Преобразование и сохранение выходного изображения
 output = output.squeeze(0)
 output = transforms.ToPILImage()(output)
 output.save(outputImage)
