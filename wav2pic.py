@@ -1,7 +1,7 @@
 from scipy.io import wavfile
 from PIL import Image
 import numpy as np
-orig_rate,orig = wavfile.read("resources/wav_porn_files/target.wav")
+orig_rate,orig = wavfile.read("resources/wav_porn_files/a.wav")
 if orig.ndim == 2:
     print("Warning, Original file is Stereo. converting to mono..")
     orig = np.mean(orig, axis=1).astype(orig.dtype)
