@@ -2,7 +2,7 @@ from scipy.io import wavfile
 from PIL import Image
 import numpy as np
 
-pic = Image.open("a.png")
+pic = Image.open("resources/wav_porn_files/a.png")
 w,h = pic.size
 x,y = (0,0)
 samples = []
