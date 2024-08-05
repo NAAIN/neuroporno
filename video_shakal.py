@@ -12,21 +12,19 @@ def process_frame(image, quality):
 def main():
     video_path = 'resources/video_shakal_files/a.mp4'
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-
     cap = cv2.VideoCapture(video_path)
-
     ret, first_frame = cap.read()
+    
     if not ret:
-        print("Не удалось прочитать первый кадр из видео.")
+        print("Cant read first frame, maybe file dont exists")
         return
     
     frame_rgb = cv2.cvtColor(first_frame, cv2.COLOR_BGR2RGB)
     pil_image = PIL.Image.fromarray(frame_rgb)
     frame_size = pil_image.size
-
-    out = cv2.VideoWriter('resources/video_shakal_files/a_out.mp4', fourcc, 25, frame_size)
-
+    out = cv2.VideoWriter('resources/video_shakal_files/a_out.mp4', fourcc,cap.get(cv2.CAP_PROP_FPS), frame_size)
     cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+
     while True:
         ret, frame = cap.read()
         if not ret:
