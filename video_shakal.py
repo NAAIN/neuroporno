@@ -1,67 +1,49 @@
-import numpy as np
 import cv2
+import PIL.Image
+import numpy as np
+import io
 
-def seam_carve(image_path, new_width, new_height):
-    def calculate_energy(img):
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        grad_x = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=3)
-        grad_y = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=3)
-        energy = np.sqrt(grad_x ** 2 + grad_y ** 2)
-        return energy
+def process_frame(image, quality):
+    buffer = io.BytesIO()
+    image.save(buffer, format='JPEG', quality=quality)
+    jpeg_image = buffer.getvalue()
+    return jpeg_image
 
-    def find_seam(energy):
-        rows, cols = energy.shape
-        seam = np.zeros(rows, dtype=np.uint32)
-        cost = energy.copy()
-        for i in range(1, rows):
-            for j in range(cols):
-                min_cost = cost[i-1, j]
-                if j > 0:
-                    min_cost = min(min_cost, cost[i-1, j-1])
-                if j < cols - 1:
-                    min_cost = min(min_cost, cost[i-1, j+1])
-                cost[i, j] += min_cost
-        seam[-1] = np.argmin(cost[-1])
-        for i in range(rows-2, -1, -1):
-            j = seam[i+1]
-            if j > 0 and cost[i, j-1] < cost[i, j]:
-                j -= 1
-            if j < cols-1 and cost[i, j+1] < cost[i, j]:
-                j += 1
-            seam[i] = j
-        return seam
+def main():
+    video_path = 'resources/video_shakal_files/a.mp4'
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 
-    def remove_seam(img, seam):
-        rows, cols, _ = img.shape
-        output = np.zeros((rows, cols-1, 3), dtype=np.uint8)
-        for i in range(rows):
-            j = seam[i]
-            output[i, :, 0] = np.delete(img[i, :, 0], j)
-            output[i, :, 1] = np.delete(img[i, :, 1], j)
-            output[i, :, 2] = np.delete(img[i, :, 2], j)
-        return output
+    cap = cv2.VideoCapture(video_path)
 
-    img = cv2.imread(image_path)
-    orig_height, orig_width = img.shape[:2]
+    ret, first_frame = cap.read()
+    if not ret:
+        print("Не удалось прочитать первый кадр из видео.")
+        return
+    
+    frame_rgb = cv2.cvtColor(first_frame, cv2.COLOR_BGR2RGB)
+    pil_image = PIL.Image.fromarray(frame_rgb)
+    frame_size = pil_image.size
 
-    while orig_width > new_width:
-        energy = calculate_energy(img)
-        seam = find_seam(energy)
-        img = remove_seam(img, seam)
-        orig_width -= 1
+    out = cv2.VideoWriter('resources/video_shakal_files/a_out.mp4', fourcc, 25, frame_size)
 
-    while orig_height > new_height:
-        img = np.rot90(img, 1, (0, 1))
-        energy = calculate_energy(img)
-        seam = find_seam(energy)
-        img = remove_seam(img, seam)
-        img = np.rot90(img, -1, (0, 1))
-        orig_height -= 1
+    cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+        
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        pil_image = PIL.Image.fromarray(frame_rgb)
+        jpeg_image = process_frame(pil_image, 0)
+        jpeg_buffer = io.BytesIO(jpeg_image)
+        jpeg_pil_image = PIL.Image.open(jpeg_buffer)
+        frame_cv = np.array(jpeg_pil_image)
+        frame_cv = cv2.cvtColor(frame_cv, cv2.COLOR_RGB2BGR)
 
-    cv2.imwrite('resized_image.jpg', img)
-    return img
+        out.write(frame_cv)
 
-image_path = 'path_to_your_image.jpg'
-new_width = 300
-new_height = 400
-resized_image = seam_carve(image_path, new_width, new_height)
+    cap.release()
+    out.release()
+
+if __name__ == "__main__":
+    main()
