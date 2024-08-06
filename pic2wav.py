@@ -14,4 +14,5 @@ for i in range(w*h):
         y += 1
         x = 0
     samples.append(np.interp(pixel,[0,255],[-1,1]))
+    
 wavfile.write("resources/wav_porn_files/pic2wav_out.wav",44100,np.array(samples))
