@@ -17,7 +17,7 @@ if stereo:
     try:
         for i in range(len(orig)):
             if x != w:
-                pic.putpixel((x,y),(0,int(np.interp(orig[i,0], [-32767,32767], [0,255])),int(np.interp(orig[i,1], [-32767,32767], [0,255]))))
+                pic.putpixel((x,y),(127,int(np.interp(orig[i,0], [-32767,32767], [0,255])),int(np.interp(orig[i,1], [-32767,32767], [0,255]))))
                 x += 1
             else:
                 y += 1
@@ -28,7 +28,7 @@ else:
     try:
         for i in range(len(orig)):
             if x != w:
-                pic.putpixel((x,y),(0,0,int(np.interp(orig[i], [-32767,32767], [0,255]))))
+                pic.putpixel((x,y),(127,127,int(np.interp(orig[i], [-32767,32767], [0,255]))))
                 x += 1
             else:
                 y += 1
